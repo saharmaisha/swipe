@@ -1,4 +1,4 @@
--- Swipe: Full initial schema
+-- Veri: Full initial schema
 -- Run against a Supabase Postgres instance
 
 -- Enable required extensions

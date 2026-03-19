@@ -1,4 +1,4 @@
-# Swipe
+# Veri
 
 Web app for importing public Pinterest boards, analyzing pins with AI, and finding shoppable product matches from retailers. Swipe through results and save your favorites.
 

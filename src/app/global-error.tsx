@@ -20,7 +20,7 @@ export default function GlobalError({
         <main className="flex min-h-screen items-center justify-center px-6">
           <div className="max-w-md space-y-4 text-center">
             <p className="text-sm font-medium text-primary">Something went wrong</p>
-            <h1 className="text-3xl font-semibold tracking-tight">Swipe hit an unexpected error.</h1>
+            <h1 className="text-3xl font-semibold tracking-tight">Veri hit an unexpected error.</h1>
             <p className="text-sm text-muted-foreground">
               Try the action again. If the problem keeps happening, refresh the page or head back to the homepage.
             </p>

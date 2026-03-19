@@ -276,7 +276,7 @@ export default function BoardsPage() {
           </div>
           {importing ? (
             <p className="text-xs text-muted-foreground">
-              Large boards with sections can take a minute or two while Swipe loads every section.
+              Large boards with sections can take a minute or two while Veri loads every section.
             </p>
           ) : (
             <p className="text-xs text-muted-foreground">

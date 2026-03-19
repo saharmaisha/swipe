@@ -28,7 +28,7 @@ export default function OnboardingPage() {
 
   const steps = [
     {
-      title: 'Welcome to Swipe',
+      title: 'Welcome to Veri',
       description: 'Find shoppable versions of the outfits you love on Pinterest.',
       content: (
         <div className="flex flex-col items-center gap-6 py-8">
@@ -41,7 +41,7 @@ export default function OnboardingPage() {
           <div className="flex gap-3 p-4 rounded-lg bg-muted/50 border text-left">
             <Info className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
-              <strong className="text-foreground">Your board must be public.</strong> Swipe can only access publicly visible Pinterest boards.
+              <strong className="text-foreground">Your board must be public.</strong> Veri can only access publicly visible Pinterest boards.
               To make a board public: open it on Pinterest, tap the three dots, select &quot;Edit board&quot;, and set visibility to &quot;Public&quot;.
             </p>
           </div>

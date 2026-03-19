@@ -21,7 +21,7 @@ export default async function LandingPage() {
       <header className="container mx-auto flex items-center justify-between px-6 py-5">
         <Link href="/" className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
-          <span className="text-lg font-semibold tracking-tight">Swipe</span>
+          <span className="text-lg font-semibold tracking-tight">Veri</span>
         </Link>
         {isSignedIn ? (
           <div className="flex items-center gap-4">
@@ -183,7 +183,7 @@ export default async function LandingPage() {
 
       <footer className="border-t py-6 text-xs text-muted-foreground">
         <div className="container mx-auto flex flex-col gap-3 px-6 sm:flex-row sm:items-center sm:justify-between">
-          <span>Swipe</span>
+          <span>Veri</span>
           <div className="flex flex-wrap items-center gap-4">
             <Link href="/privacy">Privacy & terms</Link>
             <a href="mailto:smaisha@college.harvard.edu">smaisha@college.harvard.edu</a>

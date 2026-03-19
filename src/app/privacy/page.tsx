@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'Privacy & Terms | Swipe',
+  title: 'Privacy & Terms | Veri',
 };
 
 export default function PrivacyPage() {
@@ -19,9 +19,9 @@ export default function PrivacyPage() {
         </div>
 
         <section className="space-y-3">
-          <h2 className="text-xl font-medium">What Swipe does</h2>
+          <h2 className="text-xl font-medium">What Veri does</h2>
           <p className="text-sm text-muted-foreground leading-6">
-            Swipe imports Pinterest boards that you connect directly or paste as public board URLs. It analyzes the visual attributes of the pins you choose, generates search queries, and returns product matches from supported shopping providers.
+            Veri imports Pinterest boards that you connect directly or paste as public board URLs. It analyzes the visual attributes of the pins you choose, generates search queries, and returns product matches from supported shopping providers.
           </p>
         </section>
 
@@ -39,7 +39,7 @@ export default function PrivacyPage() {
         <section className="space-y-3">
           <h2 className="text-xl font-medium">How Pinterest data is accessed</h2>
           <p className="text-sm text-muted-foreground leading-6">
-            Swipe accesses only publicly available Pinterest board pages. We do not connect to your Pinterest account or store any Pinterest credentials.
+            Veri accesses only publicly available Pinterest board pages. We do not connect to your Pinterest account or store any Pinterest credentials.
           </p>
         </section>
 

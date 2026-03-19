@@ -63,7 +63,7 @@ export function AppNav({ email }: { email?: string }) {
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            <span className="font-semibold tracking-tight">Swipe</span>
+            <span className="font-semibold tracking-tight">Veri</span>
           </Link>
           <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (

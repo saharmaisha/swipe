@@ -50,7 +50,7 @@ export default function LoginPage() {
         <div className="text-center space-y-2">
           <Link href="/" className="inline-flex items-center gap-2 mb-4">
             <Sparkles className="h-6 w-6 text-primary" />
-            <span className="text-2xl font-semibold tracking-tight">Swipe</span>
+            <span className="text-2xl font-semibold tracking-tight">Veri</span>
           </Link>
           <p className="text-muted-foreground">
             Sign in to start shopping your Pinterest boards
@@ -115,7 +115,7 @@ export default function LoginPage() {
         </Card>
 
         <p className="text-center text-xs text-muted-foreground leading-relaxed">
-          By continuing you agree to let Swipe analyze your
+          By continuing you agree to let Veri analyze your
           public Pinterest boards to find shopping matches. Read our{' '}
           <Link href="/privacy" className="underline underline-offset-2">
             privacy terms
