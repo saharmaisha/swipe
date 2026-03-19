@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import Link from 'next/link';
 import { useSwipeStore } from '@/store/swipe-store';
 import type { ProductResult } from '@/lib/types/database';
+import { useTourTrigger } from '@/components/tour/useTourTrigger';
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -30,6 +31,8 @@ export default function ResultsPage() {
   } = useSwipeStore();
   const hasTrackedView = useRef(false);
   const hasTrackedComplete = useRef(false);
+
+  useTourTrigger('results');
 
   useEffect(() => {
     if (products.length === 0) {
@@ -102,31 +105,11 @@ export default function ResultsPage() {
           throw new Error('Failed to save item');
         }
 
-        const data = await response.json();
-        const syncStatus = data.item?.google_sync_status as
-          | 'pending'
-          | 'synced'
-          | 'failed'
-          | 'not_configured'
-          | undefined;
-
-        if (syncStatus === 'synced') {
-          toast.success('Saved and synced to Google Sheets', { description: product.title });
-        } else if (syncStatus === 'failed') {
-          toast.success('Saved to your list', {
-            description: 'Google Sheets sync failed. You can retry from Saved Items later.',
-          });
-        } else if (syncStatus === 'not_configured') {
-          toast.success('Saved to your list', {
-            description: 'Connect Google Sheets in Settings to auto-export your saves.',
-          });
-        } else {
-          toast.success('Saved to your list', { description: product.title });
-        }
+        toast.success('Saved to your list', { description: product.title });
       } catch {
         unsaveProduct(product.id);
         toast.error('Could not save this item', {
-          description: 'Please try again. Your Google Sheets export was not updated.',
+          description: 'Please try again.',
         });
       }
     },
@@ -205,14 +188,16 @@ export default function ResultsPage() {
         </div>
       )}
 
-      <ProductSwipeDeck
-        products={products}
-        currentIndex={currentIndex}
-        onSave={handleSave}
-        onSkip={handleSkip}
-        onUndo={handleUndo}
-        canUndo={history.length > 0}
-      />
+      <div data-tour="swipe-deck">
+        <ProductSwipeDeck
+          products={products}
+          currentIndex={currentIndex}
+          onSave={handleSave}
+          onSkip={handleSkip}
+          onUndo={handleUndo}
+          canUndo={history.length > 0}
+        />
+      </div>
     </div>
   );
 }

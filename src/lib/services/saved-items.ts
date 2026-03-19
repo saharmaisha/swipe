@@ -27,8 +27,6 @@ export async function upsertSavedItem(input: {
   productResultId: string;
   pinId: string;
   searchRunId: string;
-  googleSyncStatus: 'pending' | 'synced' | 'failed' | 'not_configured';
-  googleSyncError?: string | null;
 }): Promise<SavedItemWithProduct> {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -39,8 +37,6 @@ export async function upsertSavedItem(input: {
         product_result_id: input.productResultId,
         pin_id: input.pinId,
         search_run_id: input.searchRunId,
-        google_sync_status: input.googleSyncStatus,
-        google_sync_error: input.googleSyncError ?? null,
       },
       { onConflict: 'user_id,product_result_id' }
     )

@@ -119,11 +119,6 @@ export const boardImportSchema = z.object({
   board_url: z.string().url().optional(),
 });
 
-export const googleIntegrationSchema = z.object({
-  spreadsheet_id: z.string().trim().min(1).nullable().optional(),
-  sheet_name: z.string().trim().min(1).optional(),
-});
-
 export const preferencesSchema = z.object({
   default_budget_min: z.number().nullable().optional(),
   default_budget_max: z.number().nullable().optional(),

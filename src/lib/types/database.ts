@@ -136,21 +136,7 @@ export interface SavedItem {
   product_result_id: string;
   pin_id: string;
   search_run_id: string;
-  google_sync_status: 'pending' | 'synced' | 'failed' | 'not_configured';
-  google_sync_error: string | null;
   created_at: string;
-}
-
-export interface GoogleIntegration {
-  id: string;
-  user_id: string;
-  google_connected: boolean;
-  spreadsheet_id: string | null;
-  sheet_name: string | null;
-  access_token_encrypted: string | null;
-  refresh_token_encrypted: string | null;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface UserPreferences {
@@ -183,7 +169,6 @@ export interface AppEvent {
   created_at: string;
 }
 
-export type GoogleSyncStatus = SavedItem['google_sync_status'];
 export type AnalysisMode = PinAnalysis['analysis_mode'];
 export type SearchMode = SearchRun['mode'];
 export type SearchScope = NonNullable<SearchRun['search_scope']>;

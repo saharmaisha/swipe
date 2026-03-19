@@ -2,62 +2,66 @@
 
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { ExternalLink, RefreshCw, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import type { ProductResult, GoogleSyncStatus } from '@/lib/types/database';
+import { ExternalLink, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import type { ProductResult } from '@/lib/types/database';
 
 interface SavedItemCardProps {
   product: ProductResult;
   savedAt: string;
-  syncStatus: GoogleSyncStatus;
-  selected?: boolean;
-  onSelect?: (selected: boolean) => void;
-  onRetrySync?: () => void;
+  onDelete?: () => void;
+  'data-tour'?: string;
 }
-
-const syncStatusConfig: Record<GoogleSyncStatus, { icon: typeof CheckCircle; label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
-  synced: { icon: CheckCircle, label: 'Synced', variant: 'default' },
-  pending: { icon: Clock, label: 'Pending', variant: 'outline' },
-  failed: { icon: AlertCircle, label: 'Sync failed', variant: 'destructive' },
-  not_configured: { icon: Clock, label: 'Sheets not set up', variant: 'outline' },
-};
 
 export function SavedItemCard({
   product,
   savedAt,
-  syncStatus,
-  selected,
-  onSelect,
-  onRetrySync,
+  onDelete,
+  'data-tour': dataTour,
 }: SavedItemCardProps) {
-  const syncConfig = syncStatusConfig[syncStatus];
-  const SyncIcon = syncConfig.icon;
+  const hasPinImage = product.source_pin_image_url && product.source_pin_id && product.board_id;
 
   return (
-    <Card className={`overflow-hidden transition-shadow ${selected ? 'ring-2 ring-primary' : ''}`}>
+    <Card data-tour={dataTour} className="overflow-hidden">
       <CardContent className="p-0">
-        <div className="flex gap-4">
-          <div className="w-24 h-32 relative shrink-0 bg-muted">
-            <Image
-              src={product.image_url}
-              alt={product.title}
-              fill
-              className="object-cover"
-              sizes="96px"
-            />
+        <div className="flex gap-3">
+          {/* Image comparison section */}
+          <div className="flex gap-2 shrink-0 p-3 pr-0">
+            {hasPinImage && (
+              <Link
+                href={`/pins/${product.source_pin_id}?boardId=${product.board_id}`}
+                className="flex flex-col items-center gap-1 group"
+              >
+                <div className="w-20 h-24 relative bg-muted rounded overflow-hidden ring-1 ring-border group-hover:ring-primary transition-colors">
+                  <Image
+                    src={product.source_pin_image_url!}
+                    alt="Inspiration"
+                    fill
+                    className="object-cover"
+                    sizes="80px"
+                  />
+                </div>
+                <span className="text-[10px] text-muted-foreground group-hover:text-primary transition-colors">Inspiration</span>
+              </Link>
+            )}
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-20 h-24 relative bg-muted rounded overflow-hidden ring-1 ring-border">
+                <Image
+                  src={product.image_url}
+                  alt={product.title}
+                  fill
+                  className="object-cover"
+                  sizes="80px"
+                />
+              </div>
+              <span className="text-[10px] text-muted-foreground">Product</span>
+            </div>
           </div>
 
+          {/* Details section */}
           <div className="flex-1 py-3 pr-3 space-y-2">
-            <div className="flex items-start gap-2">
-              {onSelect && (
-                <Checkbox
-                  checked={selected}
-                  onCheckedChange={onSelect}
-                  className="mt-1"
-                />
-              )}
+            <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
                 <h3 className="font-medium text-sm leading-tight line-clamp-2">{product.title}</h3>
                 <div className="flex items-center gap-2 mt-1">
@@ -65,22 +69,19 @@ export function SavedItemCard({
                   <span className="font-semibold text-sm">{product.price_text}</span>
                 </div>
               </div>
-            </div>
-
-            <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant={syncConfig.variant} className="text-xs gap-1">
-                <SyncIcon className="h-3 w-3" />
-                {syncConfig.label}
-              </Badge>
-              {syncStatus === 'failed' && onRetrySync && (
-                <Button variant="ghost" size="sm" onClick={onRetrySync} className="h-6 px-2 text-xs gap-1">
-                  <RefreshCw className="h-3 w-3" />
-                  Retry
+              {onDelete && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onDelete}
+                  className="h-8 w-8 text-muted-foreground hover:text-destructive shrink-0"
+                >
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               )}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <a
                 href={product.product_url}
                 target="_blank"
