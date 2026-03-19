@@ -11,6 +11,24 @@ import { getMockAnalysis } from '@/lib/mock/analyses';
 import type { PinAnalysis } from '@/lib/types/database';
 
 export async function analyzeImage(request: AnalysisRequest, userId: string): Promise<PinAnalysis> {
+  const supabase = await createClient();
+
+  // Check for cached analysis (skip OpenAI if same pin analyzed before)
+  if (!request.crop) {
+    const { data: existing } = await supabase
+      .from('pin_analyses')
+      .select('*')
+      .eq('pin_id', request.pin_id)
+      .eq('analysis_mode', 'full_pin')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (existing) {
+      return existing as PinAnalysis;
+    }
+  }
+
   let result: AnalysisResult;
 
   if (!isOpenAIConfigured()) {
@@ -24,7 +42,6 @@ export async function analyzeImage(request: AnalysisRequest, userId: string): Pr
     result = await callOpenAIVision(request);
   }
 
-  const supabase = await createClient();
   const { data, error } = await supabase
     .from('pin_analyses')
     .insert({
@@ -53,7 +70,7 @@ async function callOpenAIVision(request: AnalysisRequest): Promise<AnalysisResul
     : IMAGE_ANALYSIS_USER_PROMPT;
 
   const response = await openai.chat.completions.create({
-    model: 'gpt-4o',
+    model: 'gpt-4o-mini',
     messages: [
       { role: 'system', content: IMAGE_ANALYSIS_SYSTEM_PROMPT },
       {
