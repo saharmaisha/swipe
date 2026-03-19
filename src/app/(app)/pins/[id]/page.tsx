@@ -131,6 +131,10 @@ export default function PinDetailPage() {
           board: data.board || (boardId && boardName ? { id: boardId, name: boardName } : null),
         });
         router.push(`/results/${data.search_run_id}`);
+      } else if (res.status === 429 || data.error?.includes('Rate limit')) {
+        toast.error("You've reached the search limit", {
+          description: 'Please wait an hour before searching again.',
+        });
       } else {
         toast.error(data.error || 'Search failed');
       }
