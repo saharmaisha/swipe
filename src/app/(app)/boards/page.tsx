@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { LayoutGrid, RefreshCw, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import type { PinterestBoard } from '@/lib/types/database';
+import { useTourTrigger } from '@/components/tour/useTourTrigger';
 
 interface BoardWithPreviews extends PinterestBoard {
   preview_pins?: string[];
@@ -41,6 +42,8 @@ export default function BoardsPage() {
   const [syncing, setSyncing] = useState(false);
   const [importing, setImporting] = useState(false);
   const [boardUrl, setBoardUrl] = useState('');
+
+  useTourTrigger('boards');
 
   // Group boards by parent
   const groupedBoards = useMemo(() => {
@@ -216,7 +219,14 @@ export default function BoardsPage() {
           </p>
         </div>
         {boards.length > 0 && (
-          <Button onClick={syncBoards} disabled={syncing} variant="ghost" size="sm" className="gap-2 shrink-0">
+          <Button
+            data-tour="refresh-button"
+            onClick={syncBoards}
+            disabled={syncing}
+            variant="ghost"
+            size="sm"
+            className="gap-2 shrink-0"
+          >
             <RefreshCw className={`h-3.5 w-3.5 ${syncing ? 'animate-spin' : ''}`} />
             {syncing ? 'Refreshing\u2026' : 'Refresh all'}
           </Button>
@@ -227,6 +237,7 @@ export default function BoardsPage() {
         <div className="flex-1 space-y-2">
           <div className="flex gap-2">
             <Input
+              data-tour="board-url-input"
               type="url"
               placeholder="Paste a Pinterest board URL"
               value={boardUrl}
@@ -234,7 +245,13 @@ export default function BoardsPage() {
               disabled={importing}
               className="h-10"
             />
-            <Button type="submit" disabled={importing} size="sm" className="gap-2 h-10 px-4 shrink-0">
+            <Button
+              data-tour="board-import-button"
+              type="submit"
+              disabled={importing}
+              size="sm"
+              className="gap-2 h-10 px-4 shrink-0"
+            >
               <Plus className="h-3.5 w-3.5" />
               {importing ? 'Importing\u2026' : 'Import'}
             </Button>
@@ -259,7 +276,7 @@ export default function BoardsPage() {
           description="Paste a public Pinterest board URL above to get started."
         />
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-8" data-tour="boards-grid">
           {/* Grouped boards (boards with sections) */}
           {groupedBoards.groups.map((group) => (
             <div key={group.parentName} className="space-y-3">

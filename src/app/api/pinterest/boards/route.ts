@@ -5,6 +5,8 @@ import { getBoards, importBoardFromUrl, refreshBoardsAndPins } from '@/lib/servi
 import type { PinterestBoard, PinterestPin } from '@/lib/types/database';
 import { boardImportSchema } from '@/lib/utils/validators';
 
+export const maxDuration = 300;
+
 export interface BoardWithPreviews extends PinterestBoard {
   preview_pins: string[];
 }

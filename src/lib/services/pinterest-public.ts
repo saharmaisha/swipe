@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import type { PinterestBoard, PinterestPin, PinterestBoardSource } from '@/lib/types/database';
+import { connectBrowser } from '@/lib/services/browserbase';
+import type { Page, Response } from 'playwright-core';
 
 const PINTEREST_ORIGIN = 'https://www.pinterest.com';
 const PINTEREST_USER_AGENT =
@@ -10,6 +12,8 @@ const BOARD_FEED_RESOURCE_PATH = '/resource/BoardFeedResource/get/';
 const MAX_SCROLL_ITERATIONS = 80;
 const MAX_STALLED_ITERATIONS = 12;
 const SCROLL_DELAY_MS = 750;
+const PINTEREST_BROWSER_VIEWPORT = { width: 1280, height: 2200 };
+const PINTEREST_BROWSER_TIMEOUT_SECONDS = 600;
 
 type JsonRecord = Record<string, unknown>;
 
@@ -600,20 +604,39 @@ async function scrapePublicPinterestBoardWithBrowser(
   fallbackParsed: ParsedPublicBoardImport,
   options?: { extractSections?: boolean }
 ): Promise<BrowserScrapeResult> {
-  const { chromium } = await import('playwright');
-  const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({
-    viewport: { width: 1280, height: 2200 },
+  return withPinterestBrowser((page) =>
+    scrapePublicPinterestBoardPage(page, source, fallbackParsed, options)
+  );
+}
+
+async function withPinterestBrowser<T>(callback: (page: Page) => Promise<T>): Promise<T> {
+  const { browser, page } = await connectBrowser({
+    viewport: PINTEREST_BROWSER_VIEWPORT,
     userAgent: PINTEREST_USER_AGENT,
+    timeoutSeconds: PINTEREST_BROWSER_TIMEOUT_SECONDS,
   });
 
+  try {
+    return await callback(page);
+  } finally {
+    await page.close().catch(() => {});
+    await browser.close().catch(() => {});
+  }
+}
+
+async function scrapePublicPinterestBoardPage(
+  page: Page,
+  source: PublicBoardSourceInfo,
+  fallbackParsed: ParsedPublicBoardImport,
+  options?: { extractSections?: boolean }
+): Promise<BrowserScrapeResult> {
   const targetPinCount = fallbackParsed.board.expectedPinCount;
   const pinMap = new Map<string, ParsedPublicPin>(
     fallbackParsed.pins.map((pin) => [pin.pinterestPinId, pin])
   );
   const responseTasks = new Set<Promise<void>>();
 
-  page.on('response', (response) => {
+  const handleResponse = (response: Response) => {
     if (!response.url().includes(BOARD_FEED_RESOURCE_PATH)) {
       return;
     }
@@ -651,7 +674,9 @@ async function scrapePublicPinterestBoardWithBrowser(
     });
 
     responseTasks.add(task);
-  });
+  };
+
+  page.on('response', handleResponse);
 
   try {
     await page.goto(source.normalizedUrl, {
@@ -751,15 +776,9 @@ async function scrapePublicPinterestBoardWithBrowser(
             pins: Array.from(pinMap.values()),
             detectedSections,
           };
-
-    await page.close().catch(() => {});
-    await browser.close().catch(() => {});
-
     return result;
-  } catch (error) {
-    await page.close().catch(() => {});
-    await browser.close().catch(() => {});
-    throw error;
+  } finally {
+    page.off('response', handleResponse);
   }
 }
 
@@ -783,18 +802,20 @@ async function scrapeSectionWithBrowser(
   rootBoardId: string,
   source: PublicBoardSourceInfo
 ): Promise<{ sectionPinIds: string[] }> {
-  const { chromium } = await import('playwright');
-  const browser = await chromium.launch({ headless: true });
-  const page = await browser.newPage({
-    viewport: { width: 1280, height: 2200 },
-    userAgent: PINTEREST_USER_AGENT,
-  });
+  return withPinterestBrowser((page) => scrapeSectionPage(page, section, rootBoardId, source));
+}
 
+async function scrapeSectionPage(
+  page: Page,
+  section: { url: string; sectionKey: string; sectionName: string | null },
+  rootBoardId: string,
+  source: PublicBoardSourceInfo
+): Promise<{ sectionPinIds: string[] }> {
   const sectionPinIds = new Set<string>();
   const responseTasks = new Set<Promise<void>>();
   let resolvedBoardId: string | null = null;
 
-  page.on('response', (response) => {
+  const handleResponse = (response: Response) => {
     if (!response.url().includes(BOARD_FEED_RESOURCE_PATH)) {
       return;
     }
@@ -827,7 +848,9 @@ async function scrapeSectionWithBrowser(
     });
 
     responseTasks.add(task);
-  });
+  };
+
+  page.on('response', handleResponse);
 
   try {
     await page.goto(section.url, { waitUntil: 'domcontentloaded', timeout: 60000 });
@@ -888,8 +911,7 @@ async function scrapeSectionWithBrowser(
 
     await Promise.allSettled([...responseTasks]);
   } finally {
-    await page.close().catch(() => {});
-    await browser.close().catch(() => {});
+    page.off('response', handleResponse);
   }
 
   return { sectionPinIds: Array.from(sectionPinIds) };
@@ -907,66 +929,67 @@ async function scrapeBoardWithSections(boardUrl: string): Promise<ParsedPublicBo
   const html = await fetchPublicBoardHtml(source.normalizedUrl);
   const rootFallback = parsePublicBoard(html, source);
 
-  let rootParsed: BrowserScrapeResult;
-  try {
-    rootParsed = await scrapePublicPinterestBoardWithBrowser(source, rootFallback, {
-      extractSections: true,
-    });
-  } catch (error) {
-    console.warn('Browser-driven Pinterest import failed, falling back to static parse.', error);
-    rootParsed = { ...rootFallback, detectedSections: [] };
-  }
-
-  // Use browser-detected sections, fall back to static HTML extraction
-  const sectionUrls =
-    rootParsed.detectedSections.length > 0
-      ? rootParsed.detectedSections
-      : extractSectionUrlsFromHtml(html, source);
-
-  if (sectionUrls.length === 0) {
-    return rootParsed;
-  }
-
-  const pinsById = new Map<string, ParsedPublicPin>(
-    rootParsed.pins.map((pin) => [stripPinSectionSuffix(pin.pinterestPinId), toRootBoardPin(pin)])
-  );
-
-  const rootBoardId = stripSectionSuffix(rootParsed.board.pinterestBoardId);
-
-  for (const section of sectionUrls) {
+  return withPinterestBrowser(async (page) => {
+    let rootParsed: BrowserScrapeResult;
     try {
-      const sectionParsed = await scrapeSectionWithBrowser(section, rootBoardId, {
-        ...source,
-        normalizedUrl: section.url,
-        normalizedPath: `/${section.sectionKey}/`,
-        sectionKey: section.sectionKey,
-        sectionName: section.sectionName,
+      rootParsed = await scrapePublicPinterestBoardPage(page, source, rootFallback, {
+        extractSections: true,
       });
-      for (const rootPinId of sectionParsed.sectionPinIds) {
-        const existing = pinsById.get(rootPinId);
-
-        if (existing) {
-          pinsById.set(rootPinId, {
-            ...existing,
-            sectionKey: existing.sectionKey || section.sectionKey,
-            sectionName: existing.sectionName || section.sectionName,
-          });
-        }
-      }
     } catch (error) {
-      console.warn(`Section import failed for ${section.url}`, error);
+      console.warn('Browser-driven Pinterest import failed, falling back to static parse.', error);
+      rootParsed = { ...rootFallback, detectedSections: [] };
     }
-  }
 
-  const mergedPins = Array.from(pinsById.values());
+    const sectionUrls =
+      rootParsed.detectedSections.length > 0
+        ? rootParsed.detectedSections
+        : extractSectionUrlsFromHtml(html, source);
 
-  return {
-    board: {
-      ...rootParsed.board,
-      pinCount: pinsById.size,
-    },
-    pins: mergedPins,
-  };
+    if (sectionUrls.length === 0) {
+      return rootParsed;
+    }
+
+    const pinsById = new Map<string, ParsedPublicPin>(
+      rootParsed.pins.map((pin) => [stripPinSectionSuffix(pin.pinterestPinId), toRootBoardPin(pin)])
+    );
+
+    const rootBoardId = stripSectionSuffix(rootParsed.board.pinterestBoardId);
+
+    for (const section of sectionUrls) {
+      try {
+        const sectionParsed = await scrapeSectionPage(page, section, rootBoardId, {
+          ...source,
+          normalizedUrl: section.url,
+          normalizedPath: `/${section.sectionKey}/`,
+          sectionKey: section.sectionKey,
+          sectionName: section.sectionName,
+        });
+        for (const rootPinId of sectionParsed.sectionPinIds) {
+          const existing = pinsById.get(rootPinId);
+
+          if (existing) {
+            pinsById.set(rootPinId, {
+              ...existing,
+              sectionKey: existing.sectionKey || section.sectionKey,
+              sectionName: existing.sectionName || section.sectionName,
+            });
+          }
+        }
+      } catch (error) {
+        console.warn(`Section import failed for ${section.url}`, error);
+      }
+    }
+
+    const mergedPins = Array.from(pinsById.values());
+
+    return {
+      board: {
+        ...rootParsed.board,
+        pinCount: pinsById.size,
+      },
+      pins: mergedPins,
+    };
+  });
 }
 
 function buildPublicImportWarning(

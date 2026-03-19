@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useSwipeStore } from '@/store/swipe-store';
 import type { PinterestBoard, PinterestPin } from '@/lib/types/database';
+import { useTourTrigger } from '@/components/tour/useTourTrigger';
 
 const ALL_SECTIONS = '__all__';
 
@@ -38,6 +39,8 @@ export default function BoardDetailPage() {
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [cropModalPin, setCropModalPin] = useState<PinterestPin | null>(null);
   const [pinCrops, setPinCrops] = useState<Map<string, PixelCrop>>(new Map());
+
+  useTourTrigger('boardDetail');
 
   const fetchPins = async () => {
     try {
@@ -377,6 +380,7 @@ export default function BoardDetailPage() {
                     $
                   </span>
                   <Input
+                    data-tour="budget-input"
                     id="budget"
                     type="number"
                     value={budgetMax}
@@ -401,6 +405,7 @@ export default function BoardDetailPage() {
                 )}
                 {hasSelection ? (
                   <Button
+                    data-tour="search-button"
                     onClick={() => runBoardSearch('selected_pins')}
                     disabled={searching}
                     size="sm"
@@ -413,6 +418,7 @@ export default function BoardDetailPage() {
                   </Button>
                 ) : (
                   <Button
+                    data-tour="search-button"
                     onClick={() => runBoardSearch('all_board')}
                     disabled={searching || visiblePins.length === 0}
                     size="sm"
@@ -446,8 +452,8 @@ export default function BoardDetailPage() {
               <p className="text-xs text-muted-foreground">
                 Tap to select, or use the crop icon to focus on specific areas.
               </p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                {visiblePins.map((pin) => (
+              <div data-tour="pins-grid" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                {visiblePins.map((pin, index) => (
                   <PinCard
                     key={pin.id}
                     pin={pin}
@@ -456,6 +462,7 @@ export default function BoardDetailPage() {
                     hasCrop={pinCrops.has(pin.id)}
                     onToggleSelect={togglePinSelection}
                     onCropClick={handleCropClick}
+                    data-tour={index === 0 ? 'pin-card' : undefined}
                   />
                 ))}
               </div>

@@ -10,12 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Sparkles, Search, ExternalLink, Loader2 } from 'lucide-react';
+import { ArrowLeft, Sparkles, Search, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { useSwipeStore } from '@/store/swipe-store';
 import type { PinterestPin, PinAnalysis } from '@/lib/types/database';
 import type { PixelCrop } from 'react-image-crop';
+import { useTourTrigger } from '@/components/tour/useTourTrigger';
 
 export default function PinDetailPage() {
   const params = useParams();
@@ -34,6 +35,8 @@ export default function PinDetailPage() {
   const [crop, setCrop] = useState<PixelCrop | null>(null);
 
   const [budgetMax, setBudgetMax] = useState('150');
+
+  useTourTrigger('pinDetail');
 
   useEffect(() => {
     const fetchPin = async () => {
@@ -163,25 +166,26 @@ export default function PinDetailPage() {
           <h1 className="text-lg font-semibold tracking-tight truncate">
             {pin.title || 'Pin detail'}
           </h1>
-          {pin.source_url && (
-            <a
-              href={pin.source_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1"
+          {boardId && (
+            <Link
+              href={`/boards/${boardId}`}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
             >
-              <ExternalLink className="h-3 w-3" />
-              Original source
-            </a>
+              From: {boardName || 'Board'}
+              {pin.section_name && ` / ${pin.section_name}`}
+            </Link>
           )}
         </div>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
         <div className="space-y-4">
-          <PinImageCropper imageUrl={pin.image_url} onCropComplete={handleCropComplete} />
+          <div data-tour="pin-image">
+            <PinImageCropper imageUrl={pin.image_url} onCropComplete={handleCropComplete} />
+          </div>
 
           <Button
+            data-tour="crop-button"
             onClick={handleAnalyze}
             disabled={analyzing}
             className="w-full gap-2"
@@ -226,6 +230,7 @@ export default function PinDetailPage() {
                   </div>
 
                   <Button
+                    data-tour="pin-search-button"
                     onClick={handleSearch}
                     disabled={searching}
                     className="w-full gap-2"

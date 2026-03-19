@@ -18,6 +18,7 @@ interface PinCardProps {
   hasCrop?: boolean;
   onToggleSelect?: (pinId: string, selected: boolean) => void;
   onCropClick?: (pinId: string) => void;
+  'data-tour'?: string;
 }
 
 export function PinCard({
@@ -27,6 +28,7 @@ export function PinCard({
   hasCrop = false,
   onToggleSelect,
   onCropClick,
+  'data-tour': dataTour,
 }: PinCardProps) {
   const handleToggle = () => {
     onToggleSelect?.(pin.id, !selected);
@@ -39,6 +41,7 @@ export function PinCard({
 
   return (
     <Card
+      data-tour={dataTour}
       className={cn(
         'overflow-hidden transition-all group relative',
         showSelection && 'cursor-pointer',
