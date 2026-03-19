@@ -17,8 +17,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Swipe — Pinterest to Affordable Finds',
-  description: 'Turn your Pinterest inspiration into affordable shopping finds with AI-powered outfit matching.',
+  title: 'Swipe — Shop What You Pin',
+  description: 'Turn your Pinterest fashion boards into shoppable finds. AI analyzes your style and finds affordable alternatives.',
 };
 
 export default function RootLayout({
