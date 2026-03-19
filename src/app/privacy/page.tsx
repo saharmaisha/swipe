@@ -37,9 +37,9 @@ export default function PrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-xl font-medium">How integrations are used</h2>
+          <h2 className="text-xl font-medium">How Pinterest data is accessed</h2>
           <p className="text-sm text-muted-foreground leading-6">
-            Pinterest access is used to import your boards and pins. Tokens for connected integrations are encrypted before storage.
+            Swipe accesses only publicly available Pinterest board pages. We do not connect to your Pinterest account or store any Pinterest credentials.
           </p>
         </section>
 
@@ -62,7 +62,10 @@ export default function PrivacyPage() {
         <section className="space-y-3">
           <h2 className="text-xl font-medium">Contact</h2>
           <p className="text-sm text-muted-foreground leading-6">
-            If you need support or want to request deletion of your beta data, use the feedback link in the app or contact the team through the support channel shared with your beta invite.
+            If you need support or want to request deletion of your beta data, contact us at{' '}
+            <a href="mailto:smaisha@college.harvard.edu" className="text-foreground hover:underline">
+              smaisha@college.harvard.edu
+            </a>.
           </p>
         </section>
       </main>
