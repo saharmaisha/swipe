@@ -189,7 +189,7 @@
 
 /* Driver.js tour customization */
 .driver-popover {
-  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif !important;
+  font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif !important;
   background: var(--background) !important;
   color: var(--foreground) !important;
   border: 1px solid var(--border) !important;

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import type { SavedItemWithProduct } from '@/lib/types/database';
 
+// Select all columns to match SavedItemWithProduct type
 const SAVED_ITEM_SELECT = `
   *,
   product:product_results(*),
