@@ -144,7 +144,6 @@ export interface UserPreferences {
   user_id: string;
   default_budget_min: number | null;
   default_budget_max: number | null;
-  exclude_luxury: boolean;
   created_at: string;
   updated_at: string;
 }

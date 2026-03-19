@@ -43,7 +43,6 @@ export interface TextSearchInput {
   budget_min?: number;
   budget_max?: number;
   excluded_retailers?: string[];
-  exclude_luxury?: boolean;
 }
 
 export interface ImageSearchInput {
@@ -56,7 +55,6 @@ export interface RankingContext {
   budget_min?: number;
   budget_max?: number;
   excluded_retailers: string[];
-  exclude_luxury: boolean;
   mode: 'exact' | 'vibe' | 'both';
   analysis_attributes: {
     category?: string;
@@ -76,7 +74,6 @@ export interface SearchFilters {
   budget_min?: number;
   budget_max?: number;
   excluded_retailers: string[];
-  exclude_luxury: boolean;
   length?: string;
   sleeve_preference?: string;
   color?: string;
@@ -112,6 +109,5 @@ export interface SearchSessionData {
 
 export const DEFAULT_FILTERS: SearchFilters = {
   excluded_retailers: [],
-  exclude_luxury: false,
   mode: 'both',
 };

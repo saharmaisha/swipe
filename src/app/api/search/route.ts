@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { trackAppEvent } from '@/lib/services/app-events';
 import { analyzeImage } from '@/lib/services/image-analysis';
+import { analyzeBoardStyle, getBoardStyleProfile } from '@/lib/services/board-analysis';
 import { getPreferences } from '@/lib/services/preferences';
 import { enforceRateLimit } from '@/lib/services/rate-limit';
 import { orchestrateSearch } from '@/lib/services/search-orchestrator';
@@ -42,7 +43,6 @@ export async function POST(request: Request) {
       budget_min: payload.budget_min ?? preferences.default_budget_min ?? undefined,
       budget_max: payload.budget_max ?? preferences.default_budget_max ?? undefined,
       excluded_retailers: payload.excluded_retailers || [],
-      exclude_luxury: payload.exclude_luxury ?? preferences.exclude_luxury,
       length: payload.length ?? payload.dress_length,
       sleeve_preference: payload.sleeve_preference,
       color: payload.color,
@@ -59,17 +59,45 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Select at least one pin.' }, { status: 400 });
       }
 
-      const analyses = await Promise.all(
-        selectedPins.map((pin) =>
-          analyzeImage(
-            {
-              pin_id: pin.id,
-              image_url: pin.image_url,
-            },
-            user.id
+      // For board-level searches with multiple pins, optionally analyze board style
+      // This runs in parallel with pin analyses to save time
+      const boardStylePromise = boardRequest.board_id && selectedPins.length >= 3
+        ? (async () => {
+            try {
+              // Check for existing board analysis
+              let boardAnalysis = await getBoardStyleProfile(boardRequest.board_id, user.id);
+
+              // If no cached analysis, create one (but don't block on it)
+              if (!boardAnalysis) {
+                boardAnalysis = await analyzeBoardStyle(
+                  boardRequest.board_id,
+                  user.id,
+                  boardRequest.pins
+                );
+              }
+
+              return boardAnalysis;
+            } catch {
+              // Board analysis is optional - don't fail the search
+              return null;
+            }
+          })()
+        : Promise.resolve(null);
+
+      const [analyses, boardAnalysis] = await Promise.all([
+        Promise.all(
+          selectedPins.map((pin) =>
+            analyzeImage(
+              {
+                pin_id: pin.id,
+                image_url: pin.image_url,
+              },
+              user.id
+            )
           )
-        )
-      );
+        ),
+        boardStylePromise,
+      ]);
 
       const result = await orchestrateSearch({
         pinSearches: selectedPins.map((pin, index) => ({
@@ -82,6 +110,7 @@ export async function POST(request: Request) {
         boardId: boardRequest.board_id,
         boardName: boardRequest.board_name || null,
         searchScope: boardRequest.search_scope,
+        boardStyleProfile: boardAnalysis?.style_profile,
       });
 
       await trackAppEvent({
@@ -93,6 +122,7 @@ export async function POST(request: Request) {
           searchScope: boardRequest.search_scope,
           selectedPinCount: selectedPins.length,
           productCount: result.products.length,
+          usedBoardStyle: !!boardAnalysis,
         },
       });
 
@@ -103,6 +133,7 @@ export async function POST(request: Request) {
         analyses: result.analyses,
         selected_pins: result.selectedPins,
         board: result.board,
+        board_style: boardAnalysis?.style_profile,
       });
     }
 

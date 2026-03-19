@@ -7,13 +7,6 @@ const MAINSTREAM_RETAILERS = new Set([
   'lulus', 'revolve', 'free people', 'anthropologie', 'urban outfitters',
 ]);
 
-const LUXURY_RETAILERS = new Set([
-  'gucci', 'prada', 'louis vuitton', 'chanel', 'dior', 'balenciaga',
-  'valentino', 'versace', 'fendi', 'burberry', 'saint laurent', 'givenchy',
-  'bottega veneta', 'net-a-porter', 'ssense', 'farfetch', 'mytheresa',
-  'matchesfashion', 'saks fifth avenue', 'bergdorf goodman', 'neiman marcus',
-]);
-
 const LENGTH_KEYWORDS: Record<string, string[]> = {
   mini: ['mini'],
   'above-knee': ['above knee', 'above-the-knee'],
@@ -142,11 +135,6 @@ function computeScore(product: NormalizedProduct, ctx: RankingContext): number {
   // Mainstream retailer preference
   if (MAINSTREAM_RETAILERS.has(retailerLower)) {
     score += 0.1;
-  }
-
-  // Luxury exclusion
-  if (ctx.exclude_luxury && LUXURY_RETAILERS.has(retailerLower)) {
-    score -= 0.4;
   }
 
   // Excluded retailers

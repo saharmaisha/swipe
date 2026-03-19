@@ -13,6 +13,7 @@ import type {
   SearchRun,
   ProductResult,
 } from '@/lib/types/database';
+import type { BoardStyleProfile } from './board-analysis';
 
 export interface SearchOrchestrationInput {
   pinSearches: PinSearchContext[];
@@ -21,6 +22,7 @@ export interface SearchOrchestrationInput {
   boardId?: string | null;
   boardName?: string | null;
   searchScope?: 'single_pin' | BoardSearchScope;
+  boardStyleProfile?: BoardStyleProfile;
 }
 
 export interface SearchOrchestrationResult {
@@ -41,6 +43,7 @@ export async function orchestrateSearch(
     boardId = null,
     boardName = null,
     searchScope = 'single_pin',
+    boardStyleProfile,
   } = input;
 
   if (pinSearches.length === 0) {
@@ -49,6 +52,8 @@ export async function orchestrateSearch(
 
   const textProvider = getTextProvider();
   const imageProvider = getImageProvider();
+  // Skip image provider if it's the placeholder (returns empty results)
+  const useImageProvider = imageProvider.name !== 'image-search-placeholder';
   const pinResults = await Promise.all(
     pinSearches.map(async (pinSearch) => {
       const { pin, analysis, imageUrl = pin.image_url } = pinSearch;
@@ -60,9 +65,8 @@ export async function orchestrateSearch(
           budget_min: filters.budget_min,
           budget_max: filters.budget_max,
           excluded_retailers: filters.excluded_retailers,
-          exclude_luxury: filters.exclude_luxury,
         }),
-        imageUrl
+        useImageProvider && imageUrl
           ? imageProvider.searchByImage({
               image_url: imageUrl,
               budget_min: filters.budget_min,
@@ -73,11 +77,15 @@ export async function orchestrateSearch(
 
       const textNormalized = textProvider.normalizeProducts(textRaw);
       const imageNormalized = imageProvider.normalizeProducts(imageRaw);
+      // Merge board-level style keywords with pin analysis if available
+      const mergedStyleKeywords = boardStyleProfile
+        ? [...new Set([...analysis.style_keywords, ...boardStyleProfile.key_style_keywords.slice(0, 3)])]
+        : analysis.style_keywords;
+
       const rankingContext = {
         budget_min: filters.budget_min,
         budget_max: filters.budget_max,
         excluded_retailers: filters.excluded_retailers,
-        exclude_luxury: filters.exclude_luxury,
         mode: filters.mode,
         analysis_attributes: {
           category: analysis.category,
@@ -89,8 +97,10 @@ export async function orchestrateSearch(
           neckline: analysis.neckline || undefined,
           material_or_texture: analysis.material_or_texture || undefined,
           strap_type: analysis.strap_type || undefined,
-          style_keywords: analysis.style_keywords,
+          style_keywords: mergedStyleKeywords,
         },
+        // Include board style for ranking boost
+        boardStyleAesthetic: boardStyleProfile?.style_aesthetic,
       };
 
       const rankedProducts = rankByHeuristics(

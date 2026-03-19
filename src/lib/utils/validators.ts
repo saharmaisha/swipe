@@ -66,7 +66,6 @@ const boardSearchRequestSchema = z.object({
   budget_min: z.number().nullable().optional(),
   budget_max: z.number().nullable().optional(),
   excluded_retailers: z.array(z.string()).optional(),
-  exclude_luxury: z.boolean().optional(),
   mode: z.enum(['exact', 'vibe', 'both']).optional(),
   length: z.string().optional(),
   dress_length: z.string().optional(),
@@ -84,7 +83,6 @@ const singlePinSearchRequestSchema = z.object({
   budget_min: z.number().nullable().optional(),
   budget_max: z.number().nullable().optional(),
   excluded_retailers: z.array(z.string()).optional(),
-  exclude_luxury: z.boolean().optional(),
   mode: z.enum(['exact', 'vibe', 'both']).optional(),
   length: z.string().optional(),
   dress_length: z.string().optional(),
@@ -122,7 +120,6 @@ export const boardImportSchema = z.object({
 export const preferencesSchema = z.object({
   default_budget_min: z.number().nullable().optional(),
   default_budget_max: z.number().nullable().optional(),
-  exclude_luxury: z.boolean().optional(),
 });
 
 export const savedItemCreateSchema = z.object({

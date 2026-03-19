@@ -4,7 +4,6 @@ import type { UserPreferences } from '@/lib/types/database';
 const DEFAULT_PREFERENCES: Omit<UserPreferences, 'id' | 'user_id' | 'created_at' | 'updated_at'> = {
   default_budget_min: null,
   default_budget_max: 150,
-  exclude_luxury: true,
 };
 
 export async function getPreferences(userId: string): Promise<UserPreferences> {
