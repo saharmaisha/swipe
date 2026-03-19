@@ -5,12 +5,13 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import type { PixelCrop } from 'react-image-crop';
 import { toast } from 'sonner';
-import { ArrowLeft, Image, RefreshCw, Search, X } from 'lucide-react';
+import { ArrowLeft, Image, RefreshCw, Search, Trash2, X } from 'lucide-react';
 import { PinCard } from '@/components/pins/PinCard';
 import { PinCropModal } from '@/components/pins/PinCropModal';
 import { SectionCard, type SectionData } from '@/components/sections/SectionCard';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { LoadingState } from '@/components/shared/LoadingState';
+import { SearchProgress } from '@/components/shared/SearchProgress';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -39,8 +40,36 @@ export default function BoardDetailPage() {
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [cropModalPin, setCropModalPin] = useState<PinterestPin | null>(null);
   const [pinCrops, setPinCrops] = useState<Map<string, PixelCrop>>(new Map());
+  const [deleting, setDeleting] = useState(false);
 
   useTourTrigger('boardDetail');
+
+  const deleteBoard = async () => {
+    if (!board) return;
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${board.name}"? This will also delete all saved items and search history for this board.`
+    );
+
+    if (!confirmed) return;
+
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/pinterest/boards?board_id=${boardId}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to delete board');
+      }
+
+      toast.success('Board deleted');
+      router.push('/boards');
+    } catch {
+      toast.error('Failed to delete board');
+      setDeleting(false);
+    }
+  };
 
   const fetchPins = async () => {
     try {
@@ -305,10 +334,22 @@ export default function BoardDetailPage() {
             )}
           </p>
         </div>
-        <Button onClick={importPins} disabled={importing} variant="ghost" size="sm" className="gap-2 shrink-0">
-          <RefreshCw className={`h-3.5 w-3.5 ${importing ? 'animate-spin' : ''}`} />
-          {importing ? 'Syncing...' : 'Re-sync'}
-        </Button>
+        <div className="flex items-center gap-1 shrink-0">
+          <Button onClick={importPins} disabled={importing || deleting} variant="ghost" size="sm" className="gap-2">
+            <RefreshCw className={`h-3.5 w-3.5 ${importing ? 'animate-spin' : ''}`} />
+            {importing ? 'Syncing...' : 'Re-sync'}
+          </Button>
+          <Button
+            onClick={deleteBoard}
+            disabled={deleting || importing || searching}
+            variant="ghost"
+            size="sm"
+            className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            {deleting ? 'Deleting...' : 'Delete'}
+          </Button>
+        </div>
       </div>
 
       {importing ? (
@@ -479,6 +520,12 @@ export default function BoardDetailPage() {
           pinTitle={cropModalPin.title}
           existingCrop={pinCrops.get(cropModalPin.id) || null}
           onSave={handleCropSave}
+        />
+      )}
+
+      {searching && (
+        <SearchProgress
+          pinCount={selectedPins.length > 0 ? selectedPins.length : visiblePins.length}
         />
       )}
     </div>

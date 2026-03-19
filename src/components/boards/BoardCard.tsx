@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import type { PinterestBoard } from '@/lib/types/database';
 
 interface BoardWithPreviews extends PinterestBoard {
@@ -88,4 +89,20 @@ function formatTimeAgo(date: Date): string {
   if (diffHours < 24) return `${diffHours}h ago`;
   const diffDays = Math.floor(diffHours / 24);
   return `${diffDays}d ago`;
+}
+
+export function BoardCardSkeleton() {
+  return (
+    <Card className="overflow-hidden h-full">
+      <div className="p-4 flex gap-4 h-full">
+        {/* 2x2 Preview Grid Skeleton */}
+        <Skeleton className="w-20 h-20 shrink-0 rounded-lg" />
+
+        <div className="flex-1 min-w-0 flex flex-col justify-center gap-2">
+          <Skeleton className="h-5 w-3/4" />
+          <Skeleton className="h-3 w-1/2" />
+        </div>
+      </div>
+    </Card>
+  );
 }

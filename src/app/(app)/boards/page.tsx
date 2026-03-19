@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState, useMemo, type FormEvent } from 'react';
-import { BoardCard } from '@/components/boards/BoardCard';
+import { BoardCard, BoardCardSkeleton } from '@/components/boards/BoardCard';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { LoadingState } from '@/components/shared/LoadingState';
+import { ImportProgress } from '@/components/shared/ImportProgress';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LayoutGrid, RefreshCw, Plus } from 'lucide-react';
@@ -207,7 +207,25 @@ export default function BoardsPage() {
     fetchBoards();
   }, []);
 
-  if (loading) return <LoadingState />;
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-8">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight">Boards</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Import Pinterest boards to start finding products.
+            </p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <BoardCardSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -304,6 +322,8 @@ export default function BoardsPage() {
           )}
         </div>
       )}
+
+      {importing && <ImportProgress />}
     </div>
   );
 }

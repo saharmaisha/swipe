@@ -105,3 +105,57 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+
+export async function DELETE(request: Request) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const boardId = searchParams.get('board_id');
+
+    if (!boardId) {
+      return NextResponse.json({ error: 'Board ID required' }, { status: 400 });
+    }
+
+    // Verify board belongs to user before deleting
+    const { data: board } = await supabase
+      .from('pinterest_boards')
+      .select('id, name')
+      .eq('id', boardId)
+      .eq('user_id', user.id)
+      .single();
+
+    if (!board) {
+      return NextResponse.json({ error: 'Board not found' }, { status: 404 });
+    }
+
+    // Delete will cascade to pins, saved_items, search_runs, etc.
+    const { error } = await supabase
+      .from('pinterest_boards')
+      .delete()
+      .eq('id', boardId)
+      .eq('user_id', user.id);
+
+    if (error) {
+      throw error;
+    }
+
+    await trackAppEvent({
+      userId: user.id,
+      eventType: 'board_deleted',
+      path: '/api/pinterest/boards',
+      metadata: { boardId, boardName: board.name },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Board delete error:', error);
+    const message = error instanceof Error ? error.message : 'Failed to delete board';
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
