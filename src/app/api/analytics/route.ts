@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { trackAppEvent } from '@/lib/services/app-events';
 import { analyticsEventSchema } from '@/lib/utils/validators';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   const supabase = await createClient();
   const {

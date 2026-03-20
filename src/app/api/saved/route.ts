@@ -9,6 +9,8 @@ import {
 } from '@/lib/services/saved-items';
 import { savedItemCreateSchema, savedItemDeleteSchema } from '@/lib/utils/validators';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   const supabase = await createClient();
   const {

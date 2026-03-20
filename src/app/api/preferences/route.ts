@@ -5,6 +5,8 @@ import { trackAppEvent } from '@/lib/services/app-events';
 import { getPreferences, updatePreferences } from '@/lib/services/preferences';
 import { preferencesSchema } from '@/lib/utils/validators';
 
+export const dynamic = 'force-dynamic';
+
 const preferencesUpdateSchema = preferencesSchema.extend({
   complete_onboarding: z.boolean().optional(),
 });

@@ -8,6 +8,8 @@ import { enforceRateLimit } from '@/lib/services/rate-limit';
 import { orchestrateSearch } from '@/lib/services/search-orchestrator';
 import type { BoardSearchRequest, SearchFilters } from '@/lib/types/products';
 import type { PinAnalysis, PinterestPin } from '@/lib/types/database';
+
+export const dynamic = 'force-dynamic';
 import { searchRequestSchema } from '@/lib/utils/validators';
 
 export const maxDuration = 60;

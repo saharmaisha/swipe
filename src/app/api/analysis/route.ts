@@ -6,6 +6,8 @@ import { enforceRateLimit } from '@/lib/services/rate-limit';
 import type { AnalysisRequest } from '@/lib/types/analysis';
 import { analysisRequestSchema } from '@/lib/utils/validators';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
