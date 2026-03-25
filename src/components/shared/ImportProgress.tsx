@@ -41,7 +41,7 @@ export function ImportProgress() {
           </div>
           <h3 className="font-semibold text-lg">Importing board</h3>
           <p className="text-sm text-muted-foreground">
-            This may take a minute for large boards
+            Larger boards may take longer and some pins might not come through&mdash;importing sections gives the best results.
           </p>
         </div>
 

@@ -299,7 +299,7 @@ export default function BoardsPage() {
             </p>
           ) : (
             <p className="text-xs text-muted-foreground">
-              Only public boards can be imported. Private boards aren&apos;t accessible.
+              Only public boards can be imported. Smaller boards (under ~200 pins) work best&mdash;for larger boards, we recommend importing individual sections.
             </p>
           )}
           {syncing ? (
