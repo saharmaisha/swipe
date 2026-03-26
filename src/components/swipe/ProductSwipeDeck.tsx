@@ -149,7 +149,7 @@ export function ProductSwipeDeck({
   }
 
   return (
-    <div className="flex flex-col items-center gap-5 pb-8">
+    <div className="flex flex-col items-center gap-4 pb-8">
       <div className="text-xs text-muted-foreground tabular-nums">
         {currentIndex + 1} / {products.length}
       </div>
@@ -177,71 +177,72 @@ export function ProductSwipeDeck({
         </AnimatePresence>
       </div>
 
-      {/* Action buttons for desktop */}
-      <div className="flex items-center justify-center gap-8" data-tour="action-buttons">
-        <div className="flex flex-col items-center gap-1">
-          <Button
-            variant="outline"
-            size="lg"
-            className={`h-14 w-14 rounded-full border-2 transition-all ${
-              keyboardFlash === 'left'
-                ? 'scale-110 border-destructive bg-destructive/10'
-                : 'hover:border-destructive hover:bg-destructive/10'
-            }`}
-            onClick={() => handleSwipe('left')}
-          >
-            <X className="h-6 w-6 text-destructive" />
-          </Button>
-          <span className="text-xs text-muted-foreground flex items-center gap-1">
-            <kbd className="px-1.5 py-0.5 text-[10px] bg-muted rounded border">←</kbd>
-            Skip
-          </span>
-        </div>
-        <div className="flex flex-col items-center gap-1">
-          <Button
-            variant="outline"
-            size="lg"
-            className={`h-14 w-14 rounded-full border-2 transition-all ${
-              keyboardFlash === 'right'
-                ? 'scale-110 border-green-500 bg-green-500/10'
-                : 'hover:border-green-500 hover:bg-green-500/10'
-            }`}
-            onClick={() => handleSwipe('right')}
-          >
-            <Heart className="h-6 w-6 text-green-500" />
-          </Button>
-          <span className="text-xs text-muted-foreground flex items-center gap-1">
-            Save
-            <kbd className="px-1.5 py-0.5 text-[10px] bg-muted rounded border">→</kbd>
-          </span>
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {showUndoPill && onUndo && canUndo && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-          >
+      <div className="flex flex-col items-center gap-3">
+        <div className="flex items-center justify-center gap-8" data-tour="action-buttons">
+          <div className="flex flex-col items-center gap-1">
             <Button
-              variant="secondary"
-              size="sm"
-              className="min-h-11 rounded-full px-4 gap-2 shadow-sm relative overflow-hidden"
-              onClick={handleUndoClick}
+              variant="outline"
+              size="lg"
+              className={`h-14 w-14 rounded-full border-2 transition-all ${
+                keyboardFlash === 'left'
+                  ? 'scale-110 border-destructive bg-destructive/10'
+                  : 'hover:border-destructive hover:bg-destructive/10'
+              }`}
+              onClick={() => handleSwipe('left')}
             >
-              <RotateCcw className="h-4 w-4" />
-              Undo
-              <motion.div
-                className="absolute bottom-0 left-0 h-0.5 bg-foreground/20"
-                initial={{ width: '100%' }}
-                animate={{ width: '0%' }}
-                transition={{ duration: 6, ease: 'linear' }}
-              />
+              <X className="h-6 w-6 text-destructive" />
             </Button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <span className="text-xs text-muted-foreground flex items-center gap-1">
+              <kbd className="px-1.5 py-0.5 text-[10px] bg-muted rounded border">←</kbd>
+              Skip
+            </span>
+          </div>
+          <div className="flex flex-col items-center gap-1">
+            <Button
+              variant="outline"
+              size="lg"
+              className={`h-14 w-14 rounded-full border-2 transition-all ${
+                keyboardFlash === 'right'
+                  ? 'scale-110 border-green-500 bg-green-500/10'
+                  : 'hover:border-green-500 hover:bg-green-500/10'
+              }`}
+              onClick={() => handleSwipe('right')}
+            >
+              <Heart className="h-6 w-6 text-green-500" />
+            </Button>
+            <span className="text-xs text-muted-foreground flex items-center gap-1">
+              Save
+              <kbd className="px-1.5 py-0.5 text-[10px] bg-muted rounded border">→</kbd>
+            </span>
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {showUndoPill && onUndo && canUndo && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+            >
+              <Button
+                variant="secondary"
+                size="sm"
+                className="min-h-11 rounded-full px-4 gap-2 shadow-sm relative overflow-hidden"
+                onClick={handleUndoClick}
+              >
+                <RotateCcw className="h-4 w-4" />
+                Undo
+                <motion.div
+                  className="absolute bottom-0 left-0 h-0.5 bg-foreground/20"
+                  initial={{ width: '100%' }}
+                  animate={{ width: '0%' }}
+                  transition={{ duration: 6, ease: 'linear' }}
+                />
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
