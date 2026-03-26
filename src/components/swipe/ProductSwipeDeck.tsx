@@ -149,12 +149,17 @@ export function ProductSwipeDeck({
   }
 
   return (
-    <div className="flex flex-col items-center gap-5">
+    <div className="flex flex-col items-center gap-5 pb-8">
       <div className="text-xs text-muted-foreground tabular-nums">
         {currentIndex + 1} / {products.length}
       </div>
 
-      <div className="relative w-full max-w-sm h-[min(520px,calc(100vh-320px))]" data-tour="swipe-deck">
+      <div className="relative w-full max-w-sm" data-tour="swipe-deck">
+        {/* Invisible in-flow card to set container height */}
+        <div className="invisible">
+          <ProductCard product={currentProduct || products[0]} />
+        </div>
+
         {nextProduct && (
           <div className="absolute inset-0 scale-[0.96] opacity-50 pointer-events-none">
             <ProductCard product={nextProduct} />
