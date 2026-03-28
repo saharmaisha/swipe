@@ -77,6 +77,15 @@ const MODE_WEIGHTS = {
     fitConflict: 0.1,
     keywordMatch: 0.03,
   },
+  similar: {
+    lengthMatch: 0.08,
+    lengthConflict: 0.2,
+    sleeveMatch: 0.05,
+    sleeveConflict: 0.1,
+    fitMatch: 0.04,
+    fitConflict: 0.07,
+    keywordMatch: 0.025,
+  },
   both: {
     lengthMatch: 0.08,
     lengthConflict: 0.2,
@@ -112,7 +121,11 @@ export function rankByHeuristics(
 function computeScore(product: NormalizedProduct, ctx: RankingContext): number {
   let score = product.match_score || 0.5;
   const searchableText = getSearchableText(product);
-  const modeWeights = MODE_WEIGHTS[ctx.mode];
+  const modeWeights = MODE_WEIGHTS[ctx.mode] || MODE_WEIGHTS.similar;
+
+  if (product.source_provider === 'serpapi-google-lens') {
+    score += 0.08;
+  }
 
   // Budget fit: boost products within budget
   if (product.numeric_price !== null) {

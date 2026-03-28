@@ -40,6 +40,7 @@ export default function BoardDetailPage() {
   const [activeSection, setActiveSection] = useState(ALL_SECTIONS);
   const [viewMode, setViewMode] = useState<'sections' | 'pins'>('sections');
 
+  const [searchMode, setSearchMode] = useState<'exact' | 'similar'>('exact');
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [cropModalPin, setCropModalPin] = useState<PinterestPin | null>(null);
   const [pinCrops, setPinCrops] = useState<Map<string, PixelCrop>>(new Map());
@@ -315,6 +316,7 @@ export default function BoardDetailPage() {
           search_scope: searchScope,
           budget_max: budgetMax ? parseFloat(budgetMax) : undefined,
           pin_crops: Object.keys(cropData).length > 0 ? cropData : undefined,
+          mode: searchMode,
         }),
       });
       const data = await res.json();
@@ -461,6 +463,36 @@ export default function BoardDetailPage() {
                   </Tabs>
                 </div>
               )}
+
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">
+                  Search mode
+                </Label>
+                <div className="flex rounded-lg border overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setSearchMode('exact')}
+                    className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                      searchMode === 'exact'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-background text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    Exact match
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSearchMode('similar')}
+                    className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                      searchMode === 'similar'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-background text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    Similar styles
+                  </button>
+                </div>
+              </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="budget" className="text-xs text-muted-foreground">

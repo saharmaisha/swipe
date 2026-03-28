@@ -52,21 +52,25 @@ export async function orchestrateSearch(
 
   const textProvider = getTextProvider();
   const imageProvider = getImageProvider();
-  // Skip image provider if it's the placeholder (returns empty results)
-  const useImageProvider = imageProvider.name !== 'image-search-placeholder';
+  const searchMode = filters.mode || 'similar';
+  const useText = searchMode === 'similar' || searchMode === 'both';
+  const useLens = searchMode === 'exact' || searchMode === 'both';
+
   const pinResults = await Promise.all(
     pinSearches.map(async (pinSearch) => {
       const { pin, analysis, imageUrl = pin.image_url } = pinSearch;
       const queries = [analysis.balanced_query, analysis.broad_query, analysis.specific_query];
 
       const [textRaw, imageRaw] = await Promise.all([
-        textProvider.searchByTextQueries({
-          queries,
-          budget_min: filters.budget_min,
-          budget_max: filters.budget_max,
-          excluded_retailers: filters.excluded_retailers,
-        }),
-        useImageProvider && imageUrl
+        useText
+          ? textProvider.searchByTextQueries({
+              queries,
+              budget_min: filters.budget_min,
+              budget_max: filters.budget_max,
+              excluded_retailers: filters.excluded_retailers,
+            })
+          : Promise.resolve([]),
+        useLens && imageUrl
           ? imageProvider.searchByImage({
               image_url: imageUrl,
               budget_min: filters.budget_min,

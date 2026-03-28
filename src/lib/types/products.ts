@@ -56,7 +56,7 @@ export interface RankingContext {
   budget_min?: number;
   budget_max?: number;
   excluded_retailers: string[];
-  mode: 'exact' | 'vibe' | 'both';
+  mode: 'exact' | 'similar' | 'vibe' | 'both';
   analysis_attributes: {
     category?: string;
     primary_color?: string;
@@ -78,7 +78,7 @@ export interface SearchFilters {
   length?: string;
   sleeve_preference?: string;
   color?: string;
-  mode: 'exact' | 'vibe' | 'both';
+  mode: 'exact' | 'similar' | 'vibe' | 'both';
 }
 
 export type BoardSearchScope = 'all_board' | 'selected_pins';
