@@ -33,7 +33,6 @@ export default function PinDetailPage() {
   const [crop, setCrop] = useState<PixelCrop | null>(null);
 
   const [budgetMax, setBudgetMax] = useState('150');
-  const [searchMode, setSearchMode] = useState<'exact' | 'similar'>('exact');
 
   useEffect(() => {
     const fetchPin = async () => {
@@ -116,7 +115,7 @@ export default function PinDetailPage() {
           board_id: boardId || pin?.board_id,
           board_name: boardName,
           budget_max: budgetMax ? parseFloat(budgetMax) : undefined,
-          mode: searchMode,
+          mode: 'similar',
         }),
       });
       const data = await res.json();
@@ -216,39 +215,6 @@ export default function PinDetailPage() {
                   <CardTitle className="text-sm font-medium">Find products from this pin</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-1.5">
-                    <Label className="text-xs text-muted-foreground">Search mode</Label>
-                    <div className="flex rounded-lg border overflow-hidden">
-                      <button
-                        type="button"
-                        onClick={() => setSearchMode('exact')}
-                        className={`flex-1 px-3 py-1.5 text-xs font-medium transition-colors ${
-                          searchMode === 'exact'
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-background text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        Find exact match
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setSearchMode('similar')}
-                        className={`flex-1 px-3 py-1.5 text-xs font-medium transition-colors ${
-                          searchMode === 'similar'
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-background text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        Find similar styles
-                      </button>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground">
-                      {searchMode === 'exact'
-                        ? 'Uses visual matching to find this exact item or near-identical products.'
-                        : 'Searches by style description to find alternatives in a similar style.'}
-                    </p>
-                  </div>
-
                   <div className="space-y-1.5">
                     <Label htmlFor="budget" className="text-xs text-muted-foreground">Max budget</Label>
                     <div className="relative max-w-[140px]">

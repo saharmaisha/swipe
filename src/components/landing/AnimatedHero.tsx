@@ -39,8 +39,8 @@ export function AnimatedHero({ isSignedIn }: AnimatedHeroProps) {
             transition={{ duration: 0.5, ease: 'easeOut', delay: 0.3 }}
             className="mx-auto max-w-xl text-lg leading-relaxed text-muted-foreground"
           >
-            Paste a Pinterest board and we&apos;ll find similar pieces you can
-            actually buy—from the retailers you love, at the prices you set.
+            Pinterest shows you the outfit. We find where to actually buy
+            it — real products from real stores, not just more pins.
           </motion.p>
         </div>
 

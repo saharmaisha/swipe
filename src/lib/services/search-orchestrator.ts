@@ -1,4 +1,4 @@
-import { getTextProvider, getImageProvider } from '@/lib/providers/registry';
+import { getTextProvider } from '@/lib/providers/registry';
 import { rankByHeuristics, generateMatchReason } from '@/lib/ranking/ranker';
 import { dedupeByUrl } from '@/lib/ranking/deduper';
 import { createClient } from '@/lib/supabase/server';
@@ -51,36 +51,20 @@ export async function orchestrateSearch(
   }
 
   const textProvider = getTextProvider();
-  const imageProvider = getImageProvider();
-  const searchMode = filters.mode || 'similar';
-  const useText = searchMode === 'similar' || searchMode === 'both';
-  const useLens = searchMode === 'exact' || searchMode === 'both';
 
   const pinResults = await Promise.all(
     pinSearches.map(async (pinSearch) => {
-      const { pin, analysis, imageUrl = pin.image_url } = pinSearch;
+      const { pin, analysis } = pinSearch;
       const queries = [analysis.balanced_query, analysis.broad_query, analysis.specific_query];
 
-      const [textRaw, imageRaw] = await Promise.all([
-        useText
-          ? textProvider.searchByTextQueries({
-              queries,
-              budget_min: filters.budget_min,
-              budget_max: filters.budget_max,
-              excluded_retailers: filters.excluded_retailers,
-            })
-          : Promise.resolve([]),
-        useLens && imageUrl
-          ? imageProvider.searchByImage({
-              image_url: imageUrl,
-              budget_min: filters.budget_min,
-              budget_max: filters.budget_max,
-            })
-          : Promise.resolve([]),
-      ]);
+      const textRaw = await textProvider.searchByTextQueries({
+        queries,
+        budget_min: filters.budget_min,
+        budget_max: filters.budget_max,
+        excluded_retailers: filters.excluded_retailers,
+      });
 
       const textNormalized = textProvider.normalizeProducts(textRaw);
-      const imageNormalized = imageProvider.normalizeProducts(imageRaw);
       // Merge board-level style keywords with pin analysis if available
       const mergedStyleKeywords = boardStyleProfile
         ? [...new Set([...analysis.style_keywords, ...boardStyleProfile.key_style_keywords.slice(0, 3)])]
@@ -108,7 +92,7 @@ export async function orchestrateSearch(
       };
 
       const rankedProducts = rankByHeuristics(
-        dedupeByUrl([...textNormalized, ...imageNormalized]),
+        dedupeByUrl(textNormalized),
         rankingContext
       ).map((product) => ({
         ...product,
@@ -124,14 +108,12 @@ export async function orchestrateSearch(
       return {
         rankedProducts,
         textResultCount: textNormalized.length,
-        imageResultCount: imageNormalized.length,
       };
     })
   );
 
   let combinedProducts: NormalizedProduct[] = pinResults.flatMap((result) => result.rankedProducts);
   const totalTextResults = pinResults.reduce((sum, result) => sum + result.textResultCount, 0);
-  const totalImageResults = pinResults.reduce((sum, result) => sum + result.imageResultCount, 0);
 
   combinedProducts = dedupeByUrl(combinedProducts).sort(
     (a, b) => (b.match_score || 0) - (a.match_score || 0)
@@ -142,9 +124,7 @@ export async function orchestrateSearch(
   const supabase = await createClient();
   const providerSummary = {
     text_provider: textProvider.name,
-    image_provider: imageProvider.name,
     text_results: totalTextResults,
-    image_results: totalImageResults,
     analyzed_pins: selectedPins.length,
     total_after_dedupe: combinedProducts.length,
   };

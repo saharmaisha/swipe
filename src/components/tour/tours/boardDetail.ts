@@ -31,8 +31,8 @@ export const steps: DriveStep[] = [
   {
     element: '[data-tour="search-button"]',
     popover: {
-      title: 'Find similar products',
-      description: 'Once you\'ve selected pins and set your budget, click here to find shoppable matches!',
+      title: 'Find where to buy it',
+      description: 'Hit search and we\'ll find real, buyable versions of these outfits from actual retailers — not just more pins or Instagram posts.',
       side: 'bottom',
       align: 'end',
     },

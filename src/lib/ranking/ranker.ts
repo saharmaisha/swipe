@@ -68,15 +68,6 @@ const FIT_CONFLICTS: Record<string, string[]> = {
 };
 
 const MODE_WEIGHTS = {
-  exact: {
-    lengthMatch: 0.1,
-    lengthConflict: 0.26,
-    sleeveMatch: 0.06,
-    sleeveConflict: 0.14,
-    fitMatch: 0.05,
-    fitConflict: 0.1,
-    keywordMatch: 0.03,
-  },
   similar: {
     lengthMatch: 0.08,
     lengthConflict: 0.2,
@@ -122,10 +113,6 @@ function computeScore(product: NormalizedProduct, ctx: RankingContext): number {
   let score = product.match_score || 0.5;
   const searchableText = getSearchableText(product);
   const modeWeights = MODE_WEIGHTS[ctx.mode] || MODE_WEIGHTS.similar;
-
-  if (product.source_provider === 'serpapi-google-lens') {
-    score += 0.08;
-  }
 
   // Budget fit: boost products within budget
   if (product.numeric_price !== null) {

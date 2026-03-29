@@ -10,8 +10,8 @@ const steps = [
   },
   {
     number: 2,
-    title: 'We find similar pieces',
-    description: 'Get shoppable matches from retailers you love, at prices you control.',
+    title: 'We find where to buy it',
+    description: 'Get real product links from actual stores — not repins or dead-end posts. Set your budget and we handle the rest.',
   },
   {
     number: 3,
