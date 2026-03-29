@@ -54,7 +54,8 @@ export default function LoginPage() {
           <CardHeader className="pb-4">
             <CardTitle className="text-lg">Sign in with Google</CardTitle>
             <CardDescription>
-              Continue with your Google account to start shopping your Pinterest boards.
+              Continue with your school Google account to start shopping your Pinterest boards.
+              The beta is currently limited to .edu email addresses.
             </CardDescription>
           </CardHeader>
           <CardContent>
