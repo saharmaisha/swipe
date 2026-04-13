@@ -1,4 +1,8 @@
 import type { NormalizedProduct, RankingContext } from '@/lib/types/products';
+import {
+  computeVectorScore,
+  type FeatureVector,
+} from './vector-scorer';
 
 const MAINSTREAM_RETAILERS = new Set([
   'asos', 'zara', 'h&m', 'hm', 'target', 'nordstrom', 'mango', 'uniqlo',
@@ -67,6 +71,14 @@ const FIT_CONFLICTS: Record<string, string[]> = {
   tailored: ['relaxed', 'oversized'],
 };
 
+// Occasion keywords for matching user-selected occasion filters
+const OCCASION_KEYWORDS: Record<string, string[]> = {
+  formal: ['formal', 'black tie', 'evening', 'gala', 'ball gown', 'floor length', 'elegant'],
+  cocktail: ['cocktail', 'party', 'wedding guest', 'semi-formal', 'special occasion'],
+  casual: ['casual', 'everyday', 'relaxed', 'weekend', 'comfortable', 'day dress'],
+  work: ['work', 'office', 'professional', 'business', 'workwear', 'career'],
+};
+
 const MODE_WEIGHTS = {
   similar: {
     lengthMatch: 0.08,
@@ -97,15 +109,39 @@ const MODE_WEIGHTS = {
   },
 } as const;
 
+// Blend weights: how much each scoring method contributes
+const HEURISTIC_WEIGHT = 0.6;
+const VECTOR_WEIGHT = 0.4;
+
 export function rankByHeuristics(
   products: NormalizedProduct[],
-  ctx: RankingContext
+  ctx: RankingContext,
+  learnedWeights?: FeatureVector
 ): NormalizedProduct[] {
   return products
-    .map((product) => ({
-      ...product,
-      match_score: computeScore(product, ctx),
-    }))
+    .map((product) => {
+      const heuristicScore = computeScore(product, ctx);
+      const vectorResult = computeVectorScore(product, ctx, learnedWeights);
+
+      // Blend heuristic (60%) and vector similarity (40%)
+      const blendedScore = HEURISTIC_WEIGHT * heuristicScore + VECTOR_WEIGHT * vectorResult.score;
+
+      return {
+        ...product,
+        match_score: blendedScore,
+        // Store scoring details for debugging/analysis
+        raw_payload: {
+          ...product.raw_payload,
+          _scoring: {
+            heuristic: heuristicScore,
+            vector: vectorResult.score,
+            blended: blendedScore,
+            productVector: vectorResult.productVector,
+            preferenceVector: vectorResult.preferenceVector,
+          },
+        },
+      };
+    })
     .sort((a, b) => b.match_score - a.match_score);
 }
 
@@ -204,6 +240,19 @@ function computeScore(product: NormalizedProduct, ctx: RankingContext): number {
     score += Math.min(matchingKeywords.length, 3) * modeWeights.keywordMatch;
   }
 
+  // Occasion matching: boost products that match the selected occasion
+  if (ctx.analysis_attributes.occasion) {
+    const occasionTerms = OCCASION_KEYWORDS[ctx.analysis_attributes.occasion];
+    if (occasionTerms) {
+      const matchingTerms = occasionTerms.filter((term) =>
+        matchesLiteral(searchableText, term)
+      );
+      if (matchingTerms.length > 0) {
+        score += 0.1; // Significant boost for matching occasion
+      }
+    }
+  }
+
   return Math.max(0, Math.min(1, score));
 }
 
@@ -226,6 +275,15 @@ export function generateMatchReason(product: NormalizedProduct, ctx: RankingCont
 
   if (ctx.analysis_attributes.sleeve_length && matchesCanonicalAttribute(searchableText, ctx.analysis_attributes.sleeve_length, SLEEVE_KEYWORDS)) {
     reasons.push('Matching sleeves');
+  }
+
+  // Check occasion match
+  if (ctx.analysis_attributes.occasion) {
+    const occasionTerms = OCCASION_KEYWORDS[ctx.analysis_attributes.occasion];
+    if (occasionTerms?.some((term) => matchesLiteral(searchableText, term))) {
+      const occasionLabel = ctx.analysis_attributes.occasion.charAt(0).toUpperCase() + ctx.analysis_attributes.occasion.slice(1);
+      reasons.push(`${occasionLabel} style`);
+    }
   }
 
   if (product.match_score >= 0.85) {

@@ -2,6 +2,7 @@ import { getTextProvider } from '@/lib/providers/registry';
 import { rankByHeuristics, generateMatchReason } from '@/lib/ranking/ranker';
 import { dedupeByUrl } from '@/lib/ranking/deduper';
 import { createClient } from '@/lib/supabase/server';
+import { generateSearchQueries } from '@/lib/search/query-expander';
 import type {
   NormalizedProduct,
   BoardSearchScope,
@@ -55,7 +56,9 @@ export async function orchestrateSearch(
   const pinResults = await Promise.all(
     pinSearches.map(async (pinSearch) => {
       const { pin, analysis } = pinSearch;
-      const queries = [analysis.balanced_query, analysis.broad_query, analysis.specific_query];
+      // Use query expansion to generate retail-friendly search terms
+      // This maps "formal" → "evening gown", "black tie dress", etc.
+      const queries = generateSearchQueries(analysis.balanced_query, filters);
 
       const textRaw = await textProvider.searchByTextQueries({
         queries,
@@ -69,6 +72,11 @@ export async function orchestrateSearch(
       const mergedStyleKeywords = boardStyleProfile
         ? [...new Set([...analysis.style_keywords, ...boardStyleProfile.key_style_keywords.slice(0, 3)])]
         : analysis.style_keywords;
+
+      // Merge user-selected style tags with analysis style keywords
+      const combinedStyleKeywords = filters.style_tags?.length
+        ? [...new Set([...filters.style_tags, ...mergedStyleKeywords])]
+        : mergedStyleKeywords;
 
       const rankingContext = {
         budget_min: filters.budget_min,
@@ -85,7 +93,8 @@ export async function orchestrateSearch(
           neckline: analysis.neckline || undefined,
           material_or_texture: analysis.material_or_texture || undefined,
           strap_type: analysis.strap_type || undefined,
-          style_keywords: mergedStyleKeywords,
+          style_keywords: combinedStyleKeywords,
+          occasion: filters.occasion || undefined,
         },
         // Include board style for ranking boost
         boardStyleAesthetic: boardStyleProfile?.style_aesthetic,
