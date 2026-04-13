@@ -49,6 +49,8 @@ export async function POST(request: Request) {
       sleeve_preference: payload.sleeve_preference,
       color: payload.color,
       mode: payload.mode || 'both',
+      occasion: payload.occasion,
+      style_tags: payload.style_tags,
     };
 
     if ('pins' in payload) {

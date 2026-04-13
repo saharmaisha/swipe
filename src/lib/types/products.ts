@@ -68,8 +68,11 @@ export interface RankingContext {
     material_or_texture?: string;
     strap_type?: string;
     style_keywords?: string[];
+    occasion?: string;
   };
 }
+
+export type OccasionFilter = 'formal' | 'cocktail' | 'casual' | 'work';
 
 export interface SearchFilters {
   budget_min?: number;
@@ -79,6 +82,8 @@ export interface SearchFilters {
   sleeve_preference?: string;
   color?: string;
   mode: 'similar' | 'vibe' | 'both';
+  occasion?: OccasionFilter | null;
+  style_tags?: string[];
 }
 
 export type BoardSearchScope = 'all_board' | 'selected_pins';

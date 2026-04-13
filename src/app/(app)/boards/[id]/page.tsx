@@ -6,6 +6,7 @@ import Link from 'next/link';
 import type { PixelCrop } from 'react-image-crop';
 import { toast } from 'sonner';
 import { ArrowLeft, Image, RefreshCw, Search, Trash2, X } from 'lucide-react';
+import { FilterPanel } from '@/components/filters/FilterPanel';
 import { PinCard } from '@/components/pins/PinCard';
 import { PinCropModal } from '@/components/pins/PinCropModal';
 import { SectionCard, type SectionData } from '@/components/sections/SectionCard';
@@ -18,6 +19,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useSwipeStore } from '@/store/swipe-store';
 import type { PinterestBoard, PinterestPin } from '@/lib/types/database';
+import type { OccasionFilter } from '@/lib/types/products';
 import { useTourTrigger } from '@/components/tour/useTourTrigger';
 
 const ALL_SECTIONS = '__all__';
@@ -45,6 +47,12 @@ export default function BoardDetailPage() {
   const [pinCrops, setPinCrops] = useState<Map<string, PixelCrop>>(new Map());
   const [highlightedPinId, setHighlightedPinId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  // Filter state
+  const [occasion, setOccasion] = useState<OccasionFilter | null>(null);
+  const [styleTags, setStyleTags] = useState<string[]>([]);
+  const [lengthFilter, setLengthFilter] = useState('');
+  const [colorFilter, setColorFilter] = useState('');
 
   useTourTrigger('boardDetail');
 
@@ -316,6 +324,10 @@ export default function BoardDetailPage() {
           budget_max: budgetMax ? parseFloat(budgetMax) : undefined,
           pin_crops: Object.keys(cropData).length > 0 ? cropData : undefined,
           mode: 'similar',
+          occasion: occasion || undefined,
+          style_tags: styleTags.length > 0 ? styleTags : undefined,
+          length: lengthFilter || undefined,
+          color: colorFilter || undefined,
         }),
       });
       const data = await res.json();
@@ -441,7 +453,7 @@ export default function BoardDetailPage() {
         /* Pins View */
         <>
           {pins.length > 0 && (
-            <div className="flex flex-wrap items-end gap-3 py-4 border-y">
+            <div className="flex flex-col gap-4 py-4 border-y">
               {sections.length > 0 && (
                 <div className="w-full">
                   <Tabs
@@ -463,25 +475,38 @@ export default function BoardDetailPage() {
                 </div>
               )}
 
-              <div className="space-y-1.5">
-                <Label htmlFor="budget" className="text-xs text-muted-foreground">
-                  Max budget
-                </Label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
-                    $
-                  </span>
-                  <Input
-                    data-tour="budget-input"
-                    id="budget"
-                    type="number"
-                    value={budgetMax}
-                    onChange={(e) => setBudgetMax(e.target.value)}
-                    className="pl-7 w-28 h-9"
-                    min={0}
-                  />
+              {/* Search Filters */}
+              <FilterPanel
+                occasion={occasion}
+                onOccasionChange={setOccasion}
+                styleTags={styleTags}
+                onStyleTagsChange={setStyleTags}
+                length={lengthFilter}
+                onLengthChange={setLengthFilter}
+                color={colorFilter}
+                onColorChange={setColorFilter}
+              />
+
+              <div className="flex flex-wrap items-end gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="budget" className="text-xs text-muted-foreground">
+                    Max budget
+                  </Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+                      $
+                    </span>
+                    <Input
+                      data-tour="budget-input"
+                      id="budget"
+                      type="number"
+                      value={budgetMax}
+                      onChange={(e) => setBudgetMax(e.target.value)}
+                      className="pl-7 w-28 h-9"
+                      min={0}
+                    />
+                  </div>
                 </div>
-              </div>
 
               <div className="flex gap-2 ml-auto">
                 {hasSelection && (
@@ -524,6 +549,7 @@ export default function BoardDetailPage() {
                         : 'Search this section'}
                   </Button>
                 )}
+              </div>
               </div>
             </div>
           )}

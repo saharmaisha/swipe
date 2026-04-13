@@ -71,6 +71,8 @@ const boardSearchRequestSchema = z.object({
   dress_length: z.string().optional(),
   sleeve_preference: z.string().optional(),
   color: z.string().optional(),
+  occasion: z.enum(['formal', 'cocktail', 'casual', 'work']).optional(),
+  style_tags: z.array(z.string()).optional(),
 });
 
 const singlePinSearchRequestSchema = z.object({
@@ -88,6 +90,8 @@ const singlePinSearchRequestSchema = z.object({
   dress_length: z.string().optional(),
   sleeve_preference: z.string().optional(),
   color: z.string().optional(),
+  occasion: z.enum(['formal', 'cocktail', 'casual', 'work']).optional(),
+  style_tags: z.array(z.string()).optional(),
 });
 
 export const searchRequestSchema = z.union([boardSearchRequestSchema, singlePinSearchRequestSchema]);
@@ -162,4 +166,12 @@ export const analyticsEventSchema = z.object({
   event_type: z.string().min(1).max(100),
   path: z.string().max(200).optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
+});
+
+export const swipeInteractionSchema = z.object({
+  product_result_id: z.string().uuid(),
+  search_run_id: z.string().uuid(),
+  action: z.enum(['save', 'skip']),
+  product_features: z.array(z.number()),
+  preference_features: z.array(z.number()),
 });
