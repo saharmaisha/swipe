@@ -52,7 +52,7 @@ export default function BoardDetailPage() {
   const [occasion, setOccasion] = useState<OccasionFilter | null>(null);
   const [styleTags, setStyleTags] = useState<string[]>([]);
   const [lengthFilter, setLengthFilter] = useState('');
-  const [colorFilter, setColorFilter] = useState('');
+  const [colorFilter, setColorFilter] = useState<string[]>([]);
 
   useTourTrigger('boardDetail');
 
@@ -327,7 +327,7 @@ export default function BoardDetailPage() {
           occasion: occasion || undefined,
           style_tags: styleTags.length > 0 ? styleTags : undefined,
           length: lengthFilter || undefined,
-          color: colorFilter || undefined,
+          colors: colorFilter.length > 0 ? colorFilter : undefined,
         }),
       });
       const data = await res.json();
@@ -476,16 +476,18 @@ export default function BoardDetailPage() {
               )}
 
               {/* Search Filters */}
-              <FilterPanel
-                occasion={occasion}
-                onOccasionChange={setOccasion}
-                styleTags={styleTags}
-                onStyleTagsChange={setStyleTags}
-                length={lengthFilter}
-                onLengthChange={setLengthFilter}
-                color={colorFilter}
-                onColorChange={setColorFilter}
-              />
+              <div data-tour="filter-panel">
+                <FilterPanel
+                  occasion={occasion}
+                  onOccasionChange={setOccasion}
+                  styleTags={styleTags}
+                  onStyleTagsChange={setStyleTags}
+                  length={lengthFilter}
+                  onLengthChange={setLengthFilter}
+                  colors={colorFilter}
+                  onColorsChange={setColorFilter}
+                />
+              </div>
 
               <div className="flex flex-wrap items-end gap-3">
                 <div className="space-y-1.5">

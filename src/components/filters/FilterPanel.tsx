@@ -37,11 +37,20 @@ const LENGTH_OPTIONS = [
 const COLOR_SWATCHES: { value: string; label: string; hex: string }[] = [
   { value: 'black', label: 'Black', hex: '#000000' },
   { value: 'white', label: 'White', hex: '#FFFFFF' },
-  { value: 'red', label: 'Red', hex: '#DC2626' },
-  { value: 'blue', label: 'Blue', hex: '#2563EB' },
-  { value: 'pink', label: 'Pink', hex: '#EC4899' },
-  { value: 'green', label: 'Green', hex: '#16A34A' },
+  { value: 'ivory', label: 'Ivory', hex: '#FFFFF0' },
   { value: 'neutral', label: 'Neutral', hex: '#A3A3A3' },
+  { value: 'brown', label: 'Brown', hex: '#8B4513' },
+  { value: 'red', label: 'Red', hex: '#DC2626' },
+  { value: 'burgundy', label: 'Burgundy', hex: '#800020' },
+  { value: 'orange', label: 'Orange', hex: '#EA580C' },
+  { value: 'yellow', label: 'Yellow', hex: '#FACC15' },
+  { value: 'green', label: 'Green', hex: '#16A34A' },
+  { value: 'blue', label: 'Blue', hex: '#2563EB' },
+  { value: 'navy', label: 'Navy', hex: '#1E3A5F' },
+  { value: 'purple', label: 'Purple', hex: '#9333EA' },
+  { value: 'pink', label: 'Pink', hex: '#EC4899' },
+  { value: 'gold', label: 'Gold', hex: '#D4AF37' },
+  { value: 'silver', label: 'Silver', hex: '#C0C0C0' },
 ];
 
 export interface FilterPanelProps {
@@ -51,8 +60,8 @@ export interface FilterPanelProps {
   onStyleTagsChange: (tags: string[]) => void;
   length: string;
   onLengthChange: (length: string) => void;
-  color: string;
-  onColorChange: (color: string) => void;
+  colors: string[];
+  onColorsChange: (colors: string[]) => void;
 }
 
 export function FilterPanel({
@@ -62,8 +71,8 @@ export function FilterPanel({
   onStyleTagsChange,
   length,
   onLengthChange,
-  color,
-  onColorChange,
+  colors,
+  onColorsChange,
 }: FilterPanelProps) {
   const toggleStyleTag = (tag: string) => {
     if (styleTags.includes(tag)) {
@@ -73,21 +82,29 @@ export function FilterPanel({
     }
   };
 
+  const toggleColor = (colorValue: string) => {
+    if (colors.includes(colorValue)) {
+      onColorsChange(colors.filter((c) => c !== colorValue));
+    } else {
+      onColorsChange([...colors, colorValue]);
+    }
+  };
+
   // Count active filters
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (occasion) count++;
     if (styleTags.length > 0) count++;
     if (length) count++;
-    if (color) count++;
+    if (colors.length > 0) count++;
     return count;
-  }, [occasion, styleTags, length, color]);
+  }, [occasion, styleTags, length, colors]);
 
   const clearAllFilters = () => {
     onOccasionChange(null);
     onStyleTagsChange([]);
     onLengthChange('');
-    onColorChange('');
+    onColorsChange([]);
   };
 
   return (
@@ -172,26 +189,30 @@ export function FilterPanel({
         </div>
       </div>
 
-      {/* Color - Visual swatches */}
+      {/* Color - Visual swatches (multi-select) */}
       <div className="space-y-2">
         <Label className="text-xs text-muted-foreground">Color</Label>
         <div className="flex flex-wrap gap-2">
-          {COLOR_SWATCHES.map((swatch) => (
-            <button
-              key={swatch.value}
-              onClick={() => onColorChange(color === swatch.value ? '' : swatch.value)}
-              className={cn(
-                'w-7 h-7 rounded-full border-2 transition-all',
-                color === swatch.value
-                  ? 'border-primary ring-2 ring-primary/30 scale-110'
-                  : 'border-muted hover:scale-105',
-                swatch.value === 'white' && 'border-gray-300'
-              )}
-              style={{ backgroundColor: swatch.hex }}
-              title={swatch.label}
-              aria-label={`Select ${swatch.label}`}
-            />
-          ))}
+          {COLOR_SWATCHES.map((swatch) => {
+            const isSelected = colors.includes(swatch.value);
+            return (
+              <button
+                key={swatch.value}
+                onClick={() => toggleColor(swatch.value)}
+                className={cn(
+                  'w-7 h-7 rounded-full border-2 transition-all',
+                  isSelected
+                    ? 'border-primary ring-2 ring-primary/30 scale-110'
+                    : 'border-muted hover:scale-105',
+                  swatch.value === 'white' && !isSelected && 'border-gray-300',
+                  swatch.value === 'ivory' && !isSelected && 'border-gray-300'
+                )}
+                style={{ backgroundColor: swatch.hex }}
+                title={swatch.label}
+                aria-label={`${isSelected ? 'Deselect' : 'Select'} ${swatch.label}`}
+              />
+            );
+          })}
         </div>
       </div>
     </div>
