@@ -12,8 +12,13 @@ This is a Next.js app backed by Supabase (auth + database), OpenAI Vision (pin a
 - AI-powered pin analysis (category, style, colors, silhouette)
 - Board-level style profiling for multi-pin searches
 - Product search via text and image providers
+- Search filters for occasion, style, length, sleeve, and color
+- Pin cropping to focus analysis on specific outfit pieces
+- Smart query expansion for better retail matching
 - Tinder-style swipe deck for browsing results
+- Preference learning from swipe interactions
 - Save, undo, and manage favorite products
+- Direct retailer brand links on product cards
 - Budget filters and default preferences
 - Onboarding flow and in-app guided tours
 
@@ -79,6 +84,7 @@ src/
     swipe/            # Product swipe deck
     boards/           # Board cards
     pins/             # Pin cards, crop modal
+    filters/          # Search filter panel
     tour/             # Guided tours
     ui/               # shadcn primitives
   lib/
