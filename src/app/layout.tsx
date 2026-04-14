@@ -17,7 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Veri — Shop What You Pin',
+  title: 'Veri: Shop What You Pin',
   description: 'Turn your Pinterest fashion boards into shoppable finds. AI analyzes your style and finds affordable alternatives.',
 };
 

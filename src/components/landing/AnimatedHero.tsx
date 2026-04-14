@@ -40,7 +40,7 @@ export function AnimatedHero({ isSignedIn }: AnimatedHeroProps) {
             className="mx-auto max-w-xl text-lg leading-relaxed text-muted-foreground"
           >
             Pinterest shows you the outfit. We find where to actually buy
-            it — real products from real stores, not just more pins.
+            it. Real products from real stores, not just more pins.
           </motion.p>
         </div>
 

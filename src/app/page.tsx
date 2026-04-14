@@ -122,7 +122,7 @@ export default async function LandingPage() {
           <div className="flex flex-wrap items-center gap-4">
             <Link href="/privacy">Privacy & terms</Link>
             <a
-              href={process.env.NEXT_PUBLIC_FEEDBACK_FORM_URL || 'https://forms.gle/68ZBQSur82AfAG8c8'}
+              href={process.env.NEXT_PUBLIC_FEEDBACK_FORM_URL || 'https://docs.google.com/forms/d/e/1FAIpQLSdZiVn2V8Y7XobGhfzzw7271ixmZwxL3jdRKUj12ieq19v-nA/viewform?usp=dialog'}
               target="_blank"
               rel="noopener noreferrer"
             >

@@ -41,7 +41,7 @@ export const steps: DriveStep[] = [
     element: '[data-tour="search-button"]',
     popover: {
       title: 'Find where to buy it',
-      description: 'Hit search and we\'ll find real, buyable versions of these outfits from actual retailers — not just more pins or Instagram posts.',
+      description: 'Hit search and we\'ll find real, buyable versions of these outfits from actual retailers, not just more pins or Instagram posts.',
       side: 'bottom',
       align: 'end',
     },

@@ -56,7 +56,7 @@ export default function PrivacyPage() {
           <p className="text-sm text-muted-foreground leading-6">
             If you need support or want to request deletion of your beta data, use our{' '}
             <a
-              href={process.env.NEXT_PUBLIC_FEEDBACK_FORM_URL || 'https://forms.gle/68ZBQSur82AfAG8c8'}
+              href={process.env.NEXT_PUBLIC_FEEDBACK_FORM_URL || 'https://docs.google.com/forms/d/e/1FAIpQLSdZiVn2V8Y7XobGhfzzw7271ixmZwxL3jdRKUj12ieq19v-nA/viewform?usp=dialog'}
               target="_blank"
               rel="noopener noreferrer"
               className="text-foreground hover:underline"
