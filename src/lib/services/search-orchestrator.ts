@@ -85,7 +85,7 @@ export async function orchestrateSearch(
         mode: filters.mode,
         analysis_attributes: {
           category: analysis.category,
-          primary_color: filters.color || analysis.primary_color,
+          primary_color: filters.colors?.[0] || analysis.primary_color,
           silhouette: analysis.silhouette || undefined,
           sleeve_length: filters.sleeve_preference || analysis.sleeve_length || undefined,
           length: filters.length || analysis.length || undefined,

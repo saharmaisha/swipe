@@ -66,12 +66,21 @@ export const LENGTH_EXPANSIONS: Record<string, string[]> = {
 // Color filter → include common alternate terms
 export const COLOR_EXPANSIONS: Record<string, string[]> = {
   black: ['black dress', 'noir dress', 'little black dress'],
-  white: ['white dress', 'ivory dress', 'cream dress'],
-  red: ['red dress', 'burgundy dress', 'wine dress', 'crimson dress'],
-  blue: ['blue dress', 'navy dress', 'royal blue dress', 'cobalt dress'],
-  pink: ['pink dress', 'blush dress', 'rose dress', 'fuchsia dress'],
-  green: ['green dress', 'emerald dress', 'sage dress', 'olive dress'],
+  white: ['white dress', 'pure white dress', 'bright white dress'],
+  ivory: ['ivory dress', 'cream dress', 'off-white dress'],
   neutral: ['beige dress', 'tan dress', 'camel dress', 'nude dress'],
+  brown: ['brown dress', 'chocolate dress', 'mocha dress', 'espresso dress'],
+  red: ['red dress', 'crimson dress', 'scarlet dress'],
+  burgundy: ['burgundy dress', 'maroon dress', 'wine dress', 'oxblood dress'],
+  orange: ['orange dress', 'coral dress', 'tangerine dress', 'peach dress'],
+  yellow: ['yellow dress', 'lemon dress', 'mustard dress', 'golden yellow dress'],
+  green: ['green dress', 'emerald dress', 'sage dress', 'olive dress'],
+  blue: ['blue dress', 'royal blue dress', 'cobalt dress', 'sky blue dress'],
+  navy: ['navy dress', 'navy blue dress', 'dark blue dress', 'midnight blue dress'],
+  purple: ['purple dress', 'violet dress', 'plum dress', 'lavender dress'],
+  pink: ['pink dress', 'blush dress', 'rose dress', 'fuchsia dress'],
+  gold: ['gold dress', 'golden dress', 'metallic gold dress', 'champagne dress'],
+  silver: ['silver dress', 'metallic silver dress', 'pewter dress', 'platinum dress'],
 };
 
 export interface QueryExpansionResult {
@@ -98,7 +107,8 @@ export function expandQuery(
   const primaryParts: string[] = [];
   if (filters.occasion) primaryParts.push(filters.occasion);
   if (filters.style_tags?.length) primaryParts.push(filters.style_tags[0]);
-  if (filters.color) primaryParts.push(filters.color);
+  // Add first color for primary query (to avoid overly long queries)
+  if (filters.colors?.length) primaryParts.push(filters.colors[0]);
   if (filters.length) primaryParts.push(filters.length);
 
   const primary = primaryParts.length > 0
@@ -115,8 +125,8 @@ export function expandQuery(
     const retailTerm = occasionTerms[0];
     const variantParts: string[] = [retailTerm];
 
-    // Add color if specified (colors are pretty universal)
-    if (filters.color) variantParts.push(filters.color);
+    // Add first color if specified (colors are pretty universal)
+    if (filters.colors?.length) variantParts.push(filters.colors[0]);
 
     // Add length expansion if specified
     if (filters.length && LENGTH_EXPANSIONS[filters.length]) {
@@ -134,14 +144,15 @@ export function expandQuery(
     if (filters.length && LENGTH_EXPANSIONS[filters.length]) {
       variantParts.push(LENGTH_EXPANSIONS[filters.length][0]);
     }
-    if (filters.color) variantParts.push(filters.color);
+    if (filters.colors?.length) variantParts.push(filters.colors[0]);
 
     variants.push(variantParts.join(' '));
   }
 
   // Variant 3: Color-focused if we have color expansions
-  if (filters.color && COLOR_EXPANSIONS[filters.color]) {
-    const colorTerms = COLOR_EXPANSIONS[filters.color];
+  const firstColor = filters.colors?.[0];
+  if (firstColor && COLOR_EXPANSIONS[firstColor]) {
+    const colorTerms = COLOR_EXPANSIONS[firstColor];
     // Use a more specific color term (e.g., "navy" instead of "blue")
     if (colorTerms.length > 1) {
       const variantParts: string[] = [];

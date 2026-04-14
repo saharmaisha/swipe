@@ -80,7 +80,7 @@ export interface SearchFilters {
   excluded_retailers: string[];
   length?: string;
   sleeve_preference?: string;
-  color?: string;
+  colors?: string[];
   mode: 'similar' | 'vibe' | 'both';
   occasion?: OccasionFilter | null;
   style_tags?: string[];

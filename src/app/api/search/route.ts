@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       excluded_retailers: payload.excluded_retailers || [],
       length: payload.length ?? payload.dress_length,
       sleeve_preference: payload.sleeve_preference,
-      color: payload.color,
+      colors: payload.colors,
       mode: payload.mode || 'both',
       occasion: payload.occasion,
       style_tags: payload.style_tags,

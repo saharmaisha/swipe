@@ -70,7 +70,7 @@ const boardSearchRequestSchema = z.object({
   length: z.string().optional(),
   dress_length: z.string().optional(),
   sleeve_preference: z.string().optional(),
-  color: z.string().optional(),
+  colors: z.array(z.string()).optional(),
   occasion: z.enum(['formal', 'cocktail', 'casual', 'work']).optional(),
   style_tags: z.array(z.string()).optional(),
 });
@@ -89,7 +89,7 @@ const singlePinSearchRequestSchema = z.object({
   length: z.string().optional(),
   dress_length: z.string().optional(),
   sleeve_preference: z.string().optional(),
-  color: z.string().optional(),
+  colors: z.array(z.string()).optional(),
   occasion: z.enum(['formal', 'cocktail', 'casual', 'work']).optional(),
   style_tags: z.array(z.string()).optional(),
 });
