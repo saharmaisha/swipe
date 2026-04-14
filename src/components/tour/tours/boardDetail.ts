@@ -20,6 +20,15 @@ export const steps: DriveStep[] = [
     },
   },
   {
+    element: '[data-tour="filter-panel"]',
+    popover: {
+      title: 'Refine your search',
+      description: 'Use filters to narrow down results by occasion, style, length, or color. Select multiple colors to find items in any of those shades.',
+      side: 'bottom',
+      align: 'start',
+    },
+  },
+  {
     element: '[data-tour="budget-input"]',
     popover: {
       title: 'Set your budget',
