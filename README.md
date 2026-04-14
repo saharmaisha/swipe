@@ -2,6 +2,8 @@
 
 Web app for importing public Pinterest boards, analyzing pins with AI, and finding shoppable product matches from retailers. Swipe through results and save your favorites.
 
+I built this over spring break to help me find grad dresses and outfits for my summer vacation. Now available to the public at [tryveri.com](https://tryveri.com).
+
 This is a Next.js app backed by Supabase (auth + database), OpenAI Vision (pin analysis), and Playwright + Browserbase (Pinterest scraping).
 
 ## Features
