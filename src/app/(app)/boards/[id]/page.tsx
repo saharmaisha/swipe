@@ -52,6 +52,7 @@ export default function BoardDetailPage() {
   const [occasion, setOccasion] = useState<OccasionFilter | null>(null);
   const [styleTags, setStyleTags] = useState<string[]>([]);
   const [lengthFilter, setLengthFilter] = useState('');
+  const [sleeveFilter, setSleeveFilter] = useState('');
   const [colorFilter, setColorFilter] = useState<string[]>([]);
 
   useTourTrigger('boardDetail');
@@ -327,6 +328,7 @@ export default function BoardDetailPage() {
           occasion: occasion || undefined,
           style_tags: styleTags.length > 0 ? styleTags : undefined,
           length: lengthFilter || undefined,
+          sleeve_preference: sleeveFilter || undefined,
           colors: colorFilter.length > 0 ? colorFilter : undefined,
         }),
       });
@@ -484,6 +486,8 @@ export default function BoardDetailPage() {
                   onStyleTagsChange={setStyleTags}
                   length={lengthFilter}
                   onLengthChange={setLengthFilter}
+                  sleeve={sleeveFilter}
+                  onSleeveChange={setSleeveFilter}
                   colors={colorFilter}
                   onColorsChange={setColorFilter}
                 />

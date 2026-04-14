@@ -33,6 +33,17 @@ const LENGTH_OPTIONS = [
   { value: 'maxi', label: 'Maxi' },
 ];
 
+const SLEEVE_OPTIONS = [
+  { value: 'sleeveless', label: 'Sleeveless' },
+  { value: 'cap', label: 'Cap' },
+  { value: 'short', label: 'Short' },
+  { value: 'elbow', label: 'Elbow' },
+  { value: 'three-quarter', label: '3/4' },
+  { value: 'long', label: 'Long' },
+  { value: 'puff', label: 'Puff' },
+  { value: 'flutter', label: 'Flutter' },
+];
+
 // Color swatches with hex values for visual selection
 const COLOR_SWATCHES: { value: string; label: string; hex: string }[] = [
   { value: 'black', label: 'Black', hex: '#000000' },
@@ -60,6 +71,8 @@ export interface FilterPanelProps {
   onStyleTagsChange: (tags: string[]) => void;
   length: string;
   onLengthChange: (length: string) => void;
+  sleeve: string;
+  onSleeveChange: (sleeve: string) => void;
   colors: string[];
   onColorsChange: (colors: string[]) => void;
 }
@@ -71,6 +84,8 @@ export function FilterPanel({
   onStyleTagsChange,
   length,
   onLengthChange,
+  sleeve,
+  onSleeveChange,
   colors,
   onColorsChange,
 }: FilterPanelProps) {
@@ -96,14 +111,16 @@ export function FilterPanel({
     if (occasion) count++;
     if (styleTags.length > 0) count++;
     if (length) count++;
+    if (sleeve) count++;
     if (colors.length > 0) count++;
     return count;
-  }, [occasion, styleTags, length, colors]);
+  }, [occasion, styleTags, length, sleeve, colors]);
 
   const clearAllFilters = () => {
     onOccasionChange(null);
     onStyleTagsChange([]);
     onLengthChange('');
+    onSleeveChange('');
     onColorsChange([]);
   };
 
@@ -181,6 +198,24 @@ export function FilterPanel({
               variant={length === opt.value ? 'default' : 'outline'}
               size="sm"
               onClick={() => onLengthChange(length === opt.value ? '' : opt.value)}
+              className="h-7 px-3 text-xs"
+            >
+              {opt.label}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Sleeve */}
+      <div className="space-y-2">
+        <Label className="text-xs text-muted-foreground">Sleeve</Label>
+        <div className="flex flex-wrap gap-1.5">
+          {SLEEVE_OPTIONS.map((opt) => (
+            <Button
+              key={opt.value}
+              variant={sleeve === opt.value ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => onSleeveChange(sleeve === opt.value ? '' : opt.value)}
               className="h-7 px-3 text-xs"
             >
               {opt.label}
